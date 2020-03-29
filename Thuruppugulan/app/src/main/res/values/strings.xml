@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Thuruppugulan</string>
+    <string name="main_screen_create_table">Create a Table</string>
+    <string name="main_screen_join_table">Join a Table</string>
+</resources>
