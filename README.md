@@ -72,11 +72,10 @@ In Kerala this game is popularly known as Lelam.
 # Miscellaneous rules
 The game is cancelled if any of the following events occur:
 
-If first hand for the first player who was dealt doesn’t have a point, card can be reshuffle
-If any player is dealt 8 cards that are worth 0 points.
-if any player makes a mistake during the game, he forfeits the points he called in the start or the opposite player gains the points which they made at the start.
-If any player has all the four Jack cards.
-If any player has all cards of the same suit.
-If the opposite pair playing against the bidding pair do not have any of the 8 trump cards (this can be known only after the trump is revealed).
-If the person next to the shuffler has point-less cards. Here's a catch if he chooses not to bid and the person next to him has again pointless cards then the game has to be cancelled but this leverage is provided to the shuffler only when all the 4 players have point-less cards.
-Many think that the maximum point that can be played for is 28 or 29. But actually it is 3
+* If first hand for the first player who was dealt doesn’t have a point, card can be reshuffle
+* If any player is dealt 8 cards that are worth 0 points.
+* if any player makes a mistake during the game, he forfeits the points he called in the start or the opposite player gains the points which they made at the start.
+* If any player has all the four Jack cards.
+* If any player has all cards of the same suit.
+* If the opposite pair playing against the bidding pair do not have any of the 8 trump cards (this can be known only after the trump is revealed).
+* If the person next to the shuffler has point-less cards. Here's a catch if he chooses not to bid and the person next to him has again pointless cards then the game has to be cancelled but this leverage is provided to the shuffler only when all the 4 players have point-less cards.
