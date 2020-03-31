@@ -2,4 +2,10 @@
     <string name="app_name">Thuruppugulan</string>
     <string name="main_screen_create_table">Create a Table</string>
     <string name="main_screen_join_table">Join a Table</string>
+    <string name="player3">Player3</string>
+    <string name="player2">Player2</string>
+    <string name="player1">Player1</string>
+    <string name="player4">Player4</string>
+    <string name="shuffle">Shuffle</string>
+    <string name="draw_cards">Draw Cards</string>
 </resources>

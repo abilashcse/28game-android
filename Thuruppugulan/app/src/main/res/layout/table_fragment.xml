@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/left_gutter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="20dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/right_gutter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_end="20dp" />
+
+    <agency.tango.android.avatarview.views.AvatarView
+        android:id="@+id/player3"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        app:av_border_color="@android:color/holo_green_dark"
+        app:av_border_width="4dp"
+        android:layout_marginTop="10dp"
+        app:av_text_size_percentage="35"
+        app:layout_constraintEnd_toStartOf="@+id/right_gutter"
+        app:layout_constraintStart_toStartOf="@+id/left_gutter"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/player3_name"
+        style="@style/TableUserName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/player3"
+        app:layout_constraintBottom_toTopOf="@id/table"
+        app:layout_constraintEnd_toStartOf="@+id/right_gutter"
+        app:layout_constraintStart_toStartOf="@+id/left_gutter"
+        app:layout_constraintTop_toBottomOf="@id/player3"
+        tools:text="@string/player3" />
+    <agency.tango.android.avatarview.views.AvatarView
+        android:id="@+id/player2"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        app:av_border_color="@android:color/holo_green_dark"
+        app:av_border_width="4dp"
+        app:av_text_size_percentage="35"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/left_gutter"
+        app:layout_constraintTop_toTopOf="parent" />
+    <TextView
+        android:id="@+id/player2_name"
+        style="@style/TableUserName"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:text="@string/player2"
+        android:gravity="center"
+        app:layout_constraintStart_toStartOf="@+id/left_gutter"
+        app:layout_constraintTop_toBottomOf="@id/player2"
+        tools:text="@string/player2" />
+
+    <agency.tango.android.avatarview.views.AvatarView
+        android:id="@+id/player1"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        app:av_border_color="@android:color/holo_green_dark"
+        app:av_border_width="4dp"
+        app:av_text_size_percentage="35"
+        android:layout_marginBottom="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/left_gutter" />
+    <TextView
+        android:id="@+id/player1_name"
+        style="@style/TableUserName"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:text="@string/player1"
+        android:gravity="center"
+        app:layout_constraintStart_toStartOf="@+id/left_gutter"
+        app:layout_constraintTop_toBottomOf="@id/player1"
+        tools:text="@string/player1" />
+
+    <agency.tango.android.avatarview.views.AvatarView
+        android:id="@+id/player4"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        app:av_border_color="@android:color/holo_green_dark"
+        app:av_border_width="4dp"
+        app:av_text_size_percentage="35"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/right_gutter"
+        app:layout_constraintTop_toTopOf="parent" />
+    <TextView
+        android:id="@+id/player4_name"
+        style="@style/TableUserName"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:text="@string/player4"
+        android:gravity="center"
+        app:layout_constraintEnd_toStartOf="@+id/right_gutter"
+        app:layout_constraintTop_toBottomOf="@id/player4"
+        tools:text="@string/player4" />
+
+    <ImageView
+        android:id="@+id/table"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/table_image"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/player4"
+        app:layout_constraintStart_toEndOf="@+id/player2"
+        app:layout_constraintTop_toTopOf="parent" />
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/player4"
+        app:layout_constraintStart_toEndOf="@+id/player2"
+        app:layout_constraintTop_toTopOf="parent"
+       >
+
+    <include layout="@layout/table_fragment_center_cards" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/right_gutter"
+        app:layout_constraintStart_toEndOf="@+id/player1">
+
+        <include layout="@layout/table_fragment_bottom_card_stack" />
+
+    </LinearLayout>
+
+    <com.dd.processbutton.iml.ActionProcessButton
+        android:id="@+id/shuffle_button"
+        android:layout_width="140dp"
+        android:layout_height="wrap_content"
+        android:text="@string/shuffle"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        custom:pb_colorComplete="@color/green_complete"
+        custom:pb_colorNormal="@color/blue_normal"
+        custom:pb_colorPressed="@color/blue_pressed"
+        custom:pb_colorProgress="@color/purple_progress"
+        app:layout_constraintEnd_toStartOf="@+id/right_gutter"
+        app:layout_constraintTop_toTopOf="parent" />
+    <com.dd.processbutton.iml.ActionProcessButton
+        android:id="@+id/draw_cards"
+        android:layout_width="140dp"
+        android:layout_height="wrap_content"
+        android:text="@string/draw_cards"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="10dp"
+        android:textSize="18sp"
+        custom:pb_colorComplete="@color/green_complete"
+        custom:pb_colorNormal="@color/blue_normal"
+        custom:pb_colorPressed="@color/blue_pressed"
+        custom:pb_colorProgress="@color/purple_progress"
+        app:layout_constraintEnd_toStartOf="@+id/right_gutter"
+        app:layout_constraintTop_toBottomOf="@id/shuffle_button" />
+</androidx.constraintlayout.widget.ConstraintLayout>
