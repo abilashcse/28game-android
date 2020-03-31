@@ -77,7 +77,3 @@ then use normal flow to push your code
 	$ git commit -m "your comments"
 	$ git push
 
-
-Another related article in Chinese
-
-1. http://4simple.github.com/docs/multipleSSHkeys/
