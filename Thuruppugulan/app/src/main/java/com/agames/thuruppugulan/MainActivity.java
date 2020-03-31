@@ -8,6 +8,7 @@ import android.os.Bundle;
 
 import com.agames.thuruppugulan.base.BaseActivity;
 import com.agames.thuruppugulan.ui.main.MainFragment;
+import com.agames.thuruppugulan.ui.main.game.Player;
 import com.agames.thuruppugulan.ui.main.game.TableFragment;
 
 import net.fitken.rose.Rose;
@@ -15,6 +16,7 @@ import net.fitken.rose.Rose;
 //http://achex.ca/dev/example_interactive.php
 public class MainActivity extends BaseActivity {
 
+    Player player;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,11 +29,11 @@ public class MainActivity extends BaseActivity {
     }
 
     public void loadTableFragment(boolean createTable) {
+        player = new Player();
+        player.playerPosition = 1;
+        player.isDealer = true;
         if (!(getCurrentFragment() instanceof TableFragment)) {
-            TableFragment newFragment = new TableFragment();
-            Bundle args = new Bundle();
-            args.putBoolean(TableFragment.CREATE_TABLE, createTable);
-            newFragment.setArguments(args);
+            TableFragment newFragment = TableFragment.newInstance(player);
             replaceFragment(newFragment);
         }
     }
