@@ -133,6 +133,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
@@ -151,24 +152,27 @@
         android:text="@string/shuffle"
         android:textColor="@android:color/white"
         android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+        app:layout_constraintTop_toBottomOf="@+id/table"
+        app:layout_constraintStart_toEndOf="@id/left_gutter"
         custom:pb_colorComplete="@color/green_complete"
         custom:pb_colorNormal="@color/blue_normal"
         custom:pb_colorPressed="@color/blue_pressed"
-        custom:pb_colorProgress="@color/purple_progress"
-        app:layout_constraintEnd_toStartOf="@+id/right_gutter"
-        app:layout_constraintTop_toTopOf="parent" />
+        custom:pb_colorProgress="@color/purple_progress" />
+
     <com.dd.processbutton.iml.ActionProcessButton
         android:id="@+id/draw_cards"
         android:layout_width="140dp"
         android:layout_height="wrap_content"
         android:text="@string/draw_cards"
         android:textColor="@android:color/white"
-        android:layout_marginTop="10dp"
         android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+        app:layout_constraintEnd_toStartOf="@+id/right_gutter"
+        app:layout_constraintStart_toEndOf="@+id/shuffle_button"
+        app:layout_constraintTop_toBottomOf="@+id/table"
         custom:pb_colorComplete="@color/green_complete"
         custom:pb_colorNormal="@color/blue_normal"
         custom:pb_colorPressed="@color/blue_pressed"
-        custom:pb_colorProgress="@color/purple_progress"
-        app:layout_constraintEnd_toStartOf="@+id/right_gutter"
-        app:layout_constraintTop_toBottomOf="@id/shuffle_button" />
+        custom:pb_colorProgress="@color/purple_progress" />
 </androidx.constraintlayout.widget.ConstraintLayout>
