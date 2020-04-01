@@ -79,3 +79,6 @@ The game is cancelled if any of the following events occur:
 * If any player has all cards of the same suit.
 * If the opposite pair playing against the bidding pair do not have any of the 8 trump cards (this can be known only after the trump is revealed).
 * If the person next to the shuffler has point-less cards. Here's a catch if he chooses not to bid and the person next to him has again pointless cards then the game has to be cancelled but this leverage is provided to the shuffler only when all the 4 players have point-less cards.
+
+## Credits
+https://pixabay.com/
