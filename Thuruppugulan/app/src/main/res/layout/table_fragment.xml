@@ -31,17 +31,18 @@
         app:av_text_size_percentage="35"
         app:layout_constraintEnd_toStartOf="@+id/right_gutter"
         app:layout_constraintStart_toStartOf="@+id/left_gutter"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBottom_toTopOf="@id/player3_name" />
 
     <TextView
         android:id="@+id/player3_name"
         style="@style/TableUserName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="40dp"
         android:text="@string/player3"
         app:layout_constraintEnd_toStartOf="@+id/right_gutter"
         app:layout_constraintStart_toStartOf="@+id/left_gutter"
-        app:layout_constraintTop_toBottomOf="@id/player3"
+        app:layout_constraintBottom_toTopOf="@id/table"
         tools:text="@string/player3" />
     <agency.tango.android.avatarview.views.AvatarView
         android:id="@+id/player2"
