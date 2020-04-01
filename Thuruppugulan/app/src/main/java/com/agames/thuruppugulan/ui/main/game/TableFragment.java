@@ -4,18 +4,14 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 
 import com.agames.thuruppugulan.R;
 import com.agames.thuruppugulan.base.BaseFragment;
 import com.agames.thuruppugulan.databinding.TableFragmentBinding;
-import com.agames.thuruppugulan.ui.main.MainViewModel;
-import com.agames.thuruppugulan.ui.main.game.props.Deck;
 
 import agency.tango.android.avatarview.IImageLoader;
 import agency.tango.android.avatarview.loader.PicassoLoader;
@@ -49,6 +45,7 @@ public class TableFragment extends BaseFragment implements View.OnClickListener 
         mRootView = binding.getRoot();
 
         imageLoader = new PicassoLoader();
+
         imageLoader.loadImage(binding.player1, DEFAULT_PROFILE_PIC, "1Player");
         imageLoader.loadImage(binding.player2, DEFAULT_PROFILE_PIC, "2Player");
         imageLoader.loadImage(binding.player3, DEFAULT_PROFILE_PIC, "3Player");

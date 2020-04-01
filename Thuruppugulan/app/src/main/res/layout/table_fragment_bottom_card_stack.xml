@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android">
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout
         android:layout_width="440dp"
-        android:layout_height="90dp">
+        android:layout_height="90dp"
+        android:layout_gravity="center_horizontal">
 
-        <androidx.cardview.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        <androidx.cardview.widget.CardView
             android:id="@+id/user_card1"
             android:layout_width="50dp"
             android:layout_height="80dp"
@@ -19,12 +21,12 @@
                 android:layout_height="match_parent" />
         </androidx.cardview.widget.CardView>
 
-        <androidx.cardview.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        <androidx.cardview.widget.CardView
             android:id="@+id/user_card2"
             android:layout_width="50dp"
             android:layout_height="80dp"
             android:layout_gravity="center"
-            android:layout_margin="1dp"
+            android:layout_marginStart="-5dp"
             card_view:cardCornerRadius="4dp">
 
             <ImageView
@@ -33,12 +35,12 @@
                 android:layout_height="match_parent" />
         </androidx.cardview.widget.CardView>
 
-        <androidx.cardview.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        <androidx.cardview.widget.CardView
             android:id="@+id/user_card3"
             android:layout_width="50dp"
             android:layout_height="80dp"
             android:layout_gravity="center"
-            android:layout_margin="1dp"
+            android:layout_marginStart="-5dp"
             card_view:cardCornerRadius="4dp">
 
             <ImageView
@@ -47,12 +49,12 @@
                 android:layout_height="match_parent" />
         </androidx.cardview.widget.CardView>
 
-        <androidx.cardview.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        <androidx.cardview.widget.CardView
             android:id="@+id/user_card4"
             android:layout_width="50dp"
             android:layout_height="80dp"
             android:layout_gravity="center"
-            android:layout_margin="1dp"
+            android:layout_marginStart="-5dp"
             card_view:cardCornerRadius="4dp">
 
             <ImageView
@@ -61,12 +63,12 @@
                 android:layout_height="match_parent" />
         </androidx.cardview.widget.CardView>
 
-        <androidx.cardview.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        <androidx.cardview.widget.CardView
             android:id="@+id/user_card5"
             android:layout_width="50dp"
             android:layout_height="80dp"
             android:layout_gravity="center"
-            android:layout_margin="1dp"
+            android:layout_marginStart="-5dp"
             card_view:cardCornerRadius="4dp">
 
             <ImageView
@@ -75,12 +77,12 @@
                 android:layout_height="match_parent" />
         </androidx.cardview.widget.CardView>
 
-        <androidx.cardview.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        <androidx.cardview.widget.CardView
             android:id="@+id/user_card6"
             android:layout_width="50dp"
             android:layout_height="80dp"
             android:layout_gravity="center"
-            android:layout_margin="1dp"
+            android:layout_marginStart="-5dp"
             card_view:cardCornerRadius="4dp">
 
             <ImageView
@@ -89,12 +91,12 @@
                 android:layout_height="match_parent" />
         </androidx.cardview.widget.CardView>
 
-        <androidx.cardview.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        <androidx.cardview.widget.CardView
             android:id="@+id/user_card7"
             android:layout_width="50dp"
             android:layout_height="80dp"
             android:layout_gravity="center"
-            android:layout_margin="1dp"
+            android:layout_marginStart="-5dp"
             card_view:cardCornerRadius="4dp">
 
             <ImageView
@@ -103,12 +105,12 @@
                 android:layout_height="match_parent" />
         </androidx.cardview.widget.CardView>
 
-        <androidx.cardview.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        <androidx.cardview.widget.CardView
             android:id="@+id/user_card8"
             android:layout_width="50dp"
             android:layout_height="80dp"
             android:layout_gravity="center"
-            android:layout_margin="1dp"
+            android:layout_marginStart="-5dp"
             card_view:cardCornerRadius="4dp">
 
             <ImageView

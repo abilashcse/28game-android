@@ -31,18 +31,18 @@
         app:av_text_size_percentage="35"
         app:layout_constraintEnd_toStartOf="@+id/right_gutter"
         app:layout_constraintStart_toStartOf="@+id/left_gutter"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBottom_toTopOf="@id/player3_name" />
 
     <TextView
         android:id="@+id/player3_name"
         style="@style/TableUserName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="40dp"
         android:text="@string/player3"
-        app:layout_constraintBottom_toTopOf="@id/table"
         app:layout_constraintEnd_toStartOf="@+id/right_gutter"
         app:layout_constraintStart_toStartOf="@+id/left_gutter"
-        app:layout_constraintTop_toBottomOf="@id/player3"
+        app:layout_constraintBottom_toTopOf="@id/table"
         tools:text="@string/player3" />
     <agency.tango.android.avatarview.views.AvatarView
         android:id="@+id/player2"
@@ -69,21 +69,25 @@
         android:id="@+id/player1"
         android:layout_width="60dp"
         android:layout_height="60dp"
+        android:layout_marginBottom="20dp"
         app:av_border_color="@android:color/holo_green_dark"
         app:av_border_width="4dp"
         app:av_text_size_percentage="35"
-        android:layout_marginBottom="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/right_gutter"
         app:layout_constraintStart_toStartOf="@+id/left_gutter" />
+
     <TextView
         android:id="@+id/player1_name"
         style="@style/TableUserName"
         android:layout_width="60dp"
         android:layout_height="wrap_content"
-        android:text="@string/player1"
         android:gravity="center"
+        android:text="@string/player1"
+        app:layout_constraintEnd_toStartOf="@+id/right_gutter"
         app:layout_constraintStart_toStartOf="@+id/left_gutter"
         app:layout_constraintTop_toBottomOf="@id/player1"
+        android:paddingBottom="10dp"
         tools:text="@string/player1" />
 
     <agency.tango.android.avatarview.views.AvatarView
@@ -128,12 +132,15 @@
 
     <include layout="@layout/table_fragment_center_cards" />
     </LinearLayout>
+
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:id="@+id/linearLayout"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:gravity="center_vertical"
+        app:layout_constraintBottom_toTopOf="@id/player1"
         app:layout_constraintEnd_toStartOf="@+id/right_gutter"
-        app:layout_constraintStart_toEndOf="@+id/player1">
+        app:layout_constraintStart_toEndOf="@+id/left_gutter">
 
         <include layout="@layout/table_fragment_bottom_card_stack" />
 
@@ -146,24 +153,27 @@
         android:text="@string/shuffle"
         android:textColor="@android:color/white"
         android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+        app:layout_constraintTop_toBottomOf="@+id/table"
+        app:layout_constraintStart_toEndOf="@id/left_gutter"
         custom:pb_colorComplete="@color/green_complete"
         custom:pb_colorNormal="@color/blue_normal"
         custom:pb_colorPressed="@color/blue_pressed"
-        custom:pb_colorProgress="@color/purple_progress"
-        app:layout_constraintEnd_toStartOf="@+id/right_gutter"
-        app:layout_constraintTop_toTopOf="parent" />
+        custom:pb_colorProgress="@color/purple_progress" />
+
     <com.dd.processbutton.iml.ActionProcessButton
         android:id="@+id/draw_cards"
         android:layout_width="140dp"
         android:layout_height="wrap_content"
         android:text="@string/draw_cards"
         android:textColor="@android:color/white"
-        android:layout_marginTop="10dp"
         android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+        app:layout_constraintEnd_toStartOf="@+id/right_gutter"
+        app:layout_constraintStart_toEndOf="@+id/shuffle_button"
+        app:layout_constraintTop_toBottomOf="@+id/table"
         custom:pb_colorComplete="@color/green_complete"
         custom:pb_colorNormal="@color/blue_normal"
         custom:pb_colorPressed="@color/blue_pressed"
-        custom:pb_colorProgress="@color/purple_progress"
-        app:layout_constraintEnd_toStartOf="@+id/right_gutter"
-        app:layout_constraintTop_toBottomOf="@id/shuffle_button" />
+        custom:pb_colorProgress="@color/purple_progress" />
 </androidx.constraintlayout.widget.ConstraintLayout>
