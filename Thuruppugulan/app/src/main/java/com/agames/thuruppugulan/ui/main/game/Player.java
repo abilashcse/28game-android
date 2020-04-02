@@ -1,6 +1,8 @@
 package com.agames.thuruppugulan.ui.main.game;
 
 
+import androidx.annotation.NonNull;
+
 import com.agames.thuruppugulan.model.GameUser;
 import com.agames.thuruppugulan.ui.main.game.props.Card;
 
@@ -21,5 +23,13 @@ public class Player {
             pointsEarn += card.getValue();
         }
         return pointsEarn;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "PlayerName: = "+user.getUserName()+"\n"+
+                "player position = "+playerPosition+"\n"+
+                "isDealer = "+isDealer;
     }
 }
