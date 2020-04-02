@@ -1,7 +1,7 @@
 package com.agames.thuruppugulan.ui.main.game.props;
 
 
-public class Card {
+public class Card implements  Comparable{
 
     private int value;
     public final int slNo;
@@ -171,4 +171,8 @@ public class Card {
         return this.cardIcon;
     }
 
+    @Override
+    public int compareTo(Object o) {
+        return 0;
+    }
 }

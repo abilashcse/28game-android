@@ -25,6 +25,7 @@ public class ThuruppuKalli {
 
     private final TableFragmentBinding ui;
     private CardView[] userCardViews;
+    private CardView[] tableCards;
 
     public interface OnGameListener {
         void onCreatedTable(String tableId);
@@ -65,8 +66,22 @@ public class ThuruppuKalli {
                 ui.cardsLayout.userCard7,
                 ui.cardsLayout.userCard8
         };
+
+        tableCards = new CardView[] {
+                ui.table.player1Card,
+                ui.table.player2Card,
+                ui.table.player3Card,
+                ui.table.player4Card
+        };
+        clearViews();
+    }
+
+    private void clearViews() {
         for (int i = 0; i < 8; i++) {
             userCardViews[i].setVisibility(View.GONE);
+        }
+        for (int i = 0; i < 4; i++) {
+            tableCards[i].setVisibility(View.GONE);
         }
     }
 
@@ -112,6 +127,9 @@ public class ThuruppuKalli {
         }
     }
 
+    private void sortMyCards() {
+
+    }
     /**
      * When a table is created, the app should create a socket connection with wss://cloud.achex.ca/00001023
      * SEND:{"auth":"<player1_userName>@00001023","passwd":"secret-pwd"}

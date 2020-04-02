@@ -10,6 +10,7 @@ public class TableFragmentViewModel extends ViewModel {
     public Player[] players = new Player[4];
     public String tableID;
     public Deck deck = new Deck();
+    public Card[] tableCards = new Card[4];
     public boolean createTable;
     public void shuffleDeck() {
         deck.shuffleDeck();
