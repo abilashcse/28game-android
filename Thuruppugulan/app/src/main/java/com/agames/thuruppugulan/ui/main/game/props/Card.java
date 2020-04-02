@@ -46,7 +46,7 @@ public class Card {
     }
 
 
-    public String getCardIcon(String cardDetails) {
+    public String getCardIcon() {
 
         // Spades
 

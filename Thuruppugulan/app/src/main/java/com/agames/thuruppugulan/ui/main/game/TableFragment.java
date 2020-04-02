@@ -12,11 +12,14 @@ import androidx.lifecycle.ViewModelProvider;
 import com.agames.thuruppugulan.R;
 import com.agames.thuruppugulan.base.BaseFragment;
 import com.agames.thuruppugulan.databinding.TableFragmentBinding;
+import com.agames.thuruppugulan.model.GameUser;
+import com.agames.thuruppugulan.ui.main.GameState;
+import com.orhanobut.logger.Logger;
 
 import agency.tango.android.avatarview.IImageLoader;
 import agency.tango.android.avatarview.loader.PicassoLoader;
 
-public class TableFragment extends BaseFragment implements View.OnClickListener {
+public class TableFragment extends BaseFragment implements View.OnClickListener, ThuruppuKalli.OnGameListener {
 
     private IImageLoader imageLoader;
     private TableFragmentViewModel mViewModel;
@@ -26,15 +29,16 @@ public class TableFragment extends BaseFragment implements View.OnClickListener 
     private Player me;
     private TableFragmentBinding binding;
     private ThuruppuKalli game;
-
+    private boolean createTable;
 
     private TableFragment() {
 
    }
 
-   public static TableFragment newInstance(Player me) {
+   public static TableFragment newInstance(Player me, boolean createTable) {
         TableFragment fragment = new TableFragment();
         fragment.me = me;
+        fragment.createTable = createTable;
         return fragment;
    }
 
@@ -61,10 +65,15 @@ public class TableFragment extends BaseFragment implements View.OnClickListener 
         super.onActivityCreated(savedInstanceState);
         mViewModel = new ViewModelProvider(this).get(TableFragmentViewModel.class);
         mViewModel.players[me.playerPosition] = me;
+        mViewModel.createTable = true;
         if (game == null) {
-            game = new ThuruppuKalli(binding, me.playerPosition, mViewModel);
+            game = new ThuruppuKalli(binding, me.playerPosition, mViewModel, this);
         }
-
+        if (createTable) {
+            game.createTable();
+        } else {
+            game.joinTable();
+        }
     }
 
     @Override
@@ -79,5 +88,31 @@ public class TableFragment extends BaseFragment implements View.OnClickListener 
                 break;
 
         }
+    }
+
+    @Override
+    public void onCreatedTable(String tableId) {
+        Logger.d("onCreatedTable "+tableId);
+        //Hard coding started
+        game.state = GameState.FRIENDS_JOINED;
+        mViewModel.players[1] = new Player();
+        mViewModel.players[1].user = new GameUser();
+        mViewModel.players[1].user.setUserName("Player 2");
+        mViewModel.players[1].playerPosition = 1;
+        mViewModel.players[2] = new Player();
+        mViewModel.players[2].user = new GameUser();
+        mViewModel.players[2].user.setUserName("Player 3");
+        mViewModel.players[2].playerPosition = 1;
+        mViewModel.players[3] = new Player();
+        mViewModel.players[3].user = new GameUser();
+        mViewModel.players[3].user.setUserName("Player 4");
+        mViewModel.players[3].playerPosition = 1;
+        //Hard coding end
+
+    }
+
+    @Override
+    public void onJoinedTable(String tableId) {
+        Logger.d("onJoinedTable "+tableId);
     }
 }

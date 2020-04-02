@@ -2,10 +2,13 @@ package com.agames.thuruppugulan.ui.main.game.props;
 
 import android.util.Log;
 
-import net.fitken.rose.Rose;
+
+import com.orhanobut.logger.AndroidLogAdapter;
+import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
 import java.util.Random;
+
 
 public class Deck {
 
@@ -13,8 +16,6 @@ public class Deck {
     private Rank rank;
     private ArrayList<Card> deck;
     private Random randomGenerator = new Random();
-
-    Rose logger = Rose.INSTANCE;
 
     public Deck() {
         this.deck = new ArrayList<Card>();
@@ -34,13 +35,19 @@ public class Deck {
         }
     }
 
-    public void drawCards() {
-        logDeck();
+    public ArrayList<Card> getFourCardOnTop() {
+        ArrayList<Card> fourCards = new ArrayList<>();
+        for (int i=0; i<4; i++) {
+            fourCards.add(i,deck.remove(0));
+        }
+        return fourCards;
     }
 
     public void shuffleDeck() {
-        logger.debugEnabled(true);
-        logger.debug("-----shuffleDeck-----");
+        int indexAny = randomGenerator.nextInt(deck.size()) % 32;
+        Card tmp = deck.get(indexAny);
+        deck.set(indexAny, deck.get(31));
+        deck.set(31, tmp);
         int index1 = randomGenerator.nextInt(deck.size()) % 32;
         int index2 = randomGenerator.nextInt(deck.size()) % 32;
         if (index1 > index2) {
@@ -48,8 +55,8 @@ public class Deck {
             index1 = index2;
             index2 = tmpIndex;
         }
-        logger.debug("index1 = " + index1);
-        logger.debug("index2 = " + index2);
+        Logger.d("index1 = " + index1);
+        Logger.d("index2 = " + index2);
         ArrayList<Card> tempDeck = new ArrayList<>();
         for (int i = index1; i < index2; i++) {
             tempDeck.add(deck.get(i));
@@ -62,19 +69,17 @@ public class Deck {
         }
         deck.clear();
         deck = tempDeck;
-        logger.debug("New deck size = " + deck.size());
-        logger.debug("-----shuffleDeck-----");
+        Logger.d("New deck size = " + deck.size());
 
 
     }
 
     public void logDeck() {
-        logger.debugEnabled(true);
-        logger.debug("------------------------------");
+        StringBuilder cardsStr = new StringBuilder();
         for (Card card : deck) {
-            Log.d(logger.getTAG(), "-> " + card.slNo + ": " + card.getCardDetails() + " <-");
+            cardsStr.append("-> ").append(card.slNo).append(": ").append(card.getCardDetails()).append(" <-\n");
         }
-        logger.debug("------------------------------");
+        Logger.d(cardsStr.toString());
     }
 
 }
