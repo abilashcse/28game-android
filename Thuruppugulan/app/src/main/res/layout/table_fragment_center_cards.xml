@@ -16,11 +16,6 @@
         card_view:layout_constraintBottom_toBottomOf="parent"
         card_view:layout_constraintStart_toStartOf="parent"
         card_view:layout_constraintTop_toTopOf="parent">
-
-        <ImageView
-            android:id="@+id/player2_card_view_image"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
     </androidx.cardview.widget.CardView>
 
     <androidx.cardview.widget.CardView
@@ -34,11 +29,6 @@
         card_view:layout_constraintBottom_toBottomOf="parent"
         card_view:layout_constraintEnd_toEndOf="parent"
         card_view:layout_constraintStart_toStartOf="@+id/player2_card">
-
-        <ImageView
-            android:id="@+id/player1_card_view_image"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
     </androidx.cardview.widget.CardView>
 
 
@@ -53,11 +43,6 @@
         card_view:layout_constraintEnd_toEndOf="parent"
         card_view:layout_constraintStart_toEndOf="@id/player1_card"
         card_view:layout_constraintTop_toTopOf="parent">
-
-        <ImageView
-            android:id="@+id/player4_card_view_image"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
     </androidx.cardview.widget.CardView>
 
     <androidx.cardview.widget.CardView
@@ -70,11 +55,6 @@
         card_view:layout_constraintEnd_toEndOf="parent"
         card_view:layout_constraintStart_toStartOf="parent"
         card_view:layout_constraintTop_toTopOf="parent">
-
-        <ImageView
-            android:id="@+id/player3_card_view_image"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
     </androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

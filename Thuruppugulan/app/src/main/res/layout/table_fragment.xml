@@ -42,7 +42,7 @@
         android:text="@string/player3"
         app:layout_constraintEnd_toStartOf="@+id/right_gutter"
         app:layout_constraintStart_toStartOf="@+id/left_gutter"
-        app:layout_constraintBottom_toTopOf="@id/table"
+        app:layout_constraintBottom_toTopOf="@id/tableImageView"
         tools:text="@string/player3" />
     <agency.tango.android.avatarview.views.AvatarView
         android:id="@+id/player2"
@@ -112,7 +112,7 @@
         tools:text="@string/player4" />
 
     <ImageView
-        android:id="@+id/table"
+        android:id="@+id/tableImageView"
         android:layout_width="200dp"
         android:layout_height="200dp"
         android:layout_marginTop="20dp"
@@ -130,52 +130,59 @@
         app:layout_constraintTop_toTopOf="parent"
        >
 
-    <include layout="@layout/table_fragment_center_cards" />
+    <include
+        android:id="@+id/table"
+        android:visibility="gone"
+        tools:visibility="gone"
+        layout="@layout/table_fragment_center_cards" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:orientation="vertical">
+            <com.dd.processbutton.iml.ActionProcessButton
+                android:id="@+id/shuffle_button"
+                android:layout_width="140dp"
+                android:layout_height="wrap_content"
+                android:text="@string/shuffle"
+                android:textColor="@android:color/white"
+                android:textSize="18sp"
+                android:layout_margin="10dp"
+                custom:pb_colorComplete="@color/green_complete"
+                custom:pb_colorNormal="@color/blue_normal"
+                custom:pb_colorPressed="@color/blue_pressed"
+                custom:pb_colorProgress="@color/purple_progress" />
+            <com.dd.processbutton.iml.ActionProcessButton
+                android:id="@+id/draw_cards"
+                android:layout_width="140dp"
+                android:layout_height="wrap_content"
+                android:text="@string/draw_cards"
+                android:layout_margin="10dp"
+                android:textColor="@android:color/white"
+                android:textSize="18sp"
+                custom:pb_colorComplete="@color/green_complete"
+                custom:pb_colorNormal="@color/blue_normal"
+                custom:pb_colorPressed="@color/blue_pressed"
+                custom:pb_colorProgress="@color/purple_progress" />
+        </LinearLayout>
     </LinearLayout>
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/table_bottom_linear_layout"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="20dp"
         app:layout_constraintBottom_toTopOf="@id/player1"
         app:layout_constraintEnd_toStartOf="@+id/right_gutter"
         app:layout_constraintStart_toEndOf="@+id/left_gutter">
 
         <include android:id="@+id/cards_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
             layout="@layout/table_fragment_bottom_card_stack"
             />
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <com.dd.processbutton.iml.ActionProcessButton
-        android:id="@+id/shuffle_button"
-        android:layout_width="140dp"
-        android:layout_height="wrap_content"
-        android:text="@string/shuffle"
-        android:textColor="@android:color/white"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/table_bottom_linear_layout"
-        app:layout_constraintTop_toBottomOf="@+id/table"
-        app:layout_constraintStart_toEndOf="@id/left_gutter"
-        custom:pb_colorComplete="@color/green_complete"
-        custom:pb_colorNormal="@color/blue_normal"
-        custom:pb_colorPressed="@color/blue_pressed"
-        custom:pb_colorProgress="@color/purple_progress" />
-
-    <com.dd.processbutton.iml.ActionProcessButton
-        android:id="@+id/draw_cards"
-        android:layout_width="140dp"
-        android:layout_height="wrap_content"
-        android:text="@string/draw_cards"
-        android:textColor="@android:color/white"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/table_bottom_linear_layout"
-        app:layout_constraintEnd_toStartOf="@+id/right_gutter"
-        app:layout_constraintStart_toEndOf="@+id/shuffle_button"
-        app:layout_constraintTop_toBottomOf="@+id/table"
-        custom:pb_colorComplete="@color/green_complete"
-        custom:pb_colorNormal="@color/blue_normal"
-        custom:pb_colorPressed="@color/blue_pressed"
-        custom:pb_colorProgress="@color/purple_progress" />
 </androidx.constraintlayout.widget.ConstraintLayout>
