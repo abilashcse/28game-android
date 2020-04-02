@@ -133,20 +133,22 @@
     <include layout="@layout/table_fragment_center_cards" />
     </LinearLayout>
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/table_bottom_linear_layout"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
+        android:layout_gravity="center_horizontal"
         app:layout_constraintBottom_toTopOf="@id/player1"
         app:layout_constraintEnd_toStartOf="@+id/right_gutter"
         app:layout_constraintStart_toEndOf="@+id/left_gutter">
 
         <include android:id="@+id/cards_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
             layout="@layout/table_fragment_bottom_card_stack"
             />
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.dd.processbutton.iml.ActionProcessButton
         android:id="@+id/shuffle_button"
