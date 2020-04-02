@@ -11,82 +11,74 @@
 
         <androidx.cardview.widget.CardView
             android:id="@+id/user_card1"
-            android:layout_width="match_parent"
+            android:layout_width="60dp"
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:layout_margin="1dp"
-            android:layout_weight="1"
             tools:background="@drawable/ace_of_diamonds"
             card_view:cardCornerRadius="10dp" />
 
         <androidx.cardview.widget.CardView
             android:id="@+id/user_card2"
-            android:layout_width="match_parent"
+            android:layout_width="60dp"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:layout_weight="1"
-            android:layout_marginStart="-5dp"
+            android:layout_marginStart="-20dp"
             card_view:cardCornerRadius="10dp">
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
             android:id="@+id/user_card3"
-            android:layout_width="match_parent"
+            android:layout_width="60dp"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:layout_marginStart="-5dp"
-            android:layout_weight="1"
+            android:layout_marginStart="-20dp"
             card_view:cardCornerRadius="10dp">
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
             android:id="@+id/user_card4"
-            android:layout_width="match_parent"
+            android:layout_width="60dp"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:layout_weight="1"
-            android:layout_marginStart="-5dp"
+            android:layout_marginStart="-20dp"
             card_view:cardCornerRadius="10dp">
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
             android:id="@+id/user_card5"
-            android:layout_width="match_parent"
+            android:layout_width="60dp"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:layout_weight="1"
-            android:layout_marginStart="-5dp"
+            android:layout_marginStart="-20dp"
             card_view:cardCornerRadius="10dp">
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
             android:id="@+id/user_card6"
-            android:layout_width="match_parent"
+            android:layout_width="60dp"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:layout_weight="1"
-            android:layout_marginStart="-5dp"
+            android:layout_marginStart="-20dp"
             card_view:cardCornerRadius="10dp">
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
             android:id="@+id/user_card7"
-            android:layout_width="match_parent"
+            android:layout_width="60dp"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:layout_weight="1"
-            android:layout_marginStart="-5dp"
+            android:layout_marginStart="-20dp"
             card_view:cardCornerRadius="10dp">
 
         </androidx.cardview.widget.CardView>
 
     <androidx.cardview.widget.CardView
         android:id="@+id/user_card8"
-        android:layout_weight="1"
-        android:layout_width="match_parent"
+        android:layout_width="60dp"
         android:layout_height="match_parent"
         android:layout_gravity="center"
-        android:layout_marginStart="-5dp"
+        android:layout_marginStart="-20dp"
         card_view:cardCornerRadius="10dp" />
 
     </LinearLayout>

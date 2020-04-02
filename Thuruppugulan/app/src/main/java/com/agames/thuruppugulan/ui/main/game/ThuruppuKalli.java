@@ -2,9 +2,12 @@ package com.agames.thuruppugulan.ui.main.game;
 
 
 import android.annotation.SuppressLint;
+import android.content.res.Resources;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.cardview.widget.CardView;
