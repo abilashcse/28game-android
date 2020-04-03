@@ -6,7 +6,6 @@ import com.agames.thuruppugulan.ui.main.game.props.Card;
 import com.agames.thuruppugulan.ui.main.game.props.Deck;
 import com.orhanobut.logger.Logger;
 
-import java.util.Collection;
 import java.util.Collections;
 
 public class TableFragmentViewModel extends ViewModel {
