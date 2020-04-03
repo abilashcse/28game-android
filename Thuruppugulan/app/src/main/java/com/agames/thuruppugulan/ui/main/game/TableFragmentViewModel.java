@@ -14,6 +14,7 @@ public class TableFragmentViewModel extends ViewModel {
     public Deck deck = new Deck();
     public Card[] tableCards = new Card[4];
     public boolean createTable;
+    public Player me;
     public void shuffleDeck() {
         deck.shuffleDeck();
     }

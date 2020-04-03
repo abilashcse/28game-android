@@ -14,6 +14,7 @@ import com.agames.thuruppugulan.base.BaseFragment;
 import com.agames.thuruppugulan.databinding.TableFragmentBinding;
 import com.agames.thuruppugulan.model.GameUser;
 import com.agames.thuruppugulan.ui.main.GameState;
+import com.agames.thuruppugulan.webrequest.WebSocketConnection;
 import com.orhanobut.logger.Logger;
 
 import agency.tango.android.avatarview.IImageLoader;
@@ -64,7 +65,7 @@ public class TableFragment extends BaseFragment implements View.OnClickListener,
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mViewModel = new ViewModelProvider(this).get(TableFragmentViewModel.class);
-        mViewModel.players[me.playerPosition] = me;
+        mViewModel.me = me;
         mViewModel.createTable = true;
         if (game == null) {
             game = new ThuruppuKalli(binding, me.playerPosition, mViewModel, this);
@@ -115,5 +116,11 @@ public class TableFragment extends BaseFragment implements View.OnClickListener,
     @Override
     public void onJoinedTable(String tableId) {
         Logger.d("onJoinedTable "+tableId);
+    }
+
+    @Override
+    public void onStop() {
+        WebSocketConnection.getInstance().close();
+        super.onStop();
     }
 }

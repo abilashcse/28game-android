@@ -50,6 +50,9 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
             case R.id.create_table:
                 ((MainActivity) getActivity()).loadTableFragment(true);
                 break;
+            case  R.id.join_table:
+                ((MainActivity) getActivity()).loadTableFragment(false);
+                break;
         }
     }
 }

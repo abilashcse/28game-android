@@ -16,11 +16,16 @@ import com.agames.thuruppugulan.R;
 import com.agames.thuruppugulan.databinding.TableFragmentBinding;
 import com.agames.thuruppugulan.ui.main.GameState;
 import com.agames.thuruppugulan.ui.main.utils.ViewUtils;
+import com.agames.thuruppugulan.webrequest.WebSocketConnection;
+import com.agames.thuruppugulan.webrequest.model.response.AuthResponse;
+import com.agames.thuruppugulan.webrequest.model.response.JoinTableResponse;
+import com.agames.thuruppugulan.webrequest.model.response.PlayerJoinedResponse;
 import com.orhanobut.logger.Logger;
 
 import java.util.Random;
 
-public class ThuruppuKalli {
+public class ThuruppuKalli implements WebSocketConnection.OnWebSocketListener {
+
     private TableFragmentViewModel viewModel;
 
     private final TableFragmentBinding ui;
@@ -35,8 +40,11 @@ public class ThuruppuKalli {
 
     private OnGameListener mGameListener;
     public GameState state;
+    private static final String STAGE_WS_INSTANCE = "00001023";
+    private static final String TEST_TABLE_ID = "6542";
+    private WebSocketConnection mWebSocket;
 
-    private static String TEST_TABLE_ID = "6542";
+    private int noOfPlayers;
 
     // Position goes like
     // 1 - 2 - 3 - 4
@@ -53,6 +61,8 @@ public class ThuruppuKalli {
         this.mGameListener = listener;
         initCardObjects(ui);
         state = GameState.INIT;
+        mWebSocket = WebSocketConnection.getInstance();
+        mWebSocket.setGameListener(this);
     }
 
     private void initCardObjects(com.agames.thuruppugulan.databinding.TableFragmentBinding ui) {
@@ -150,8 +160,9 @@ public class ThuruppuKalli {
         if (viewModel.players[myPosition].isDealer) {
             state = GameState.CREATING_TABLE;
             viewModel.tableID = TEST_TABLE_ID;
+            mWebSocket.connect(STAGE_WS_INSTANCE);
             state = GameState.WAITING_FOR_FRIENDS;
-            mGameListener.onCreatedTable(TEST_TABLE_ID);
+            //mGameListener.onCreatedTable(TEST_TABLE_ID);
 
         }
     }
@@ -165,7 +176,8 @@ public class ThuruppuKalli {
      */
     public void joinTable() {
         if (!viewModel.players[myPosition].isDealer) {
-
+            mWebSocket.connect(STAGE_WS_INSTANCE);
+            state = GameState.WAITING_FOR_FRIENDS;
         }
     }
 
@@ -210,5 +222,40 @@ public class ThuruppuKalli {
             userCardViews[i].setVisibility(View.VISIBLE);
             userCardViews[i].setBackgroundResource(resID);
         }
+    }
+
+
+    @Override
+    public void onConnected() {
+        Logger.d("onConnected");
+        mWebSocket.auth(viewModel.me.user.getUserName());
+    }
+
+    @Override
+    public void onAuthSuccess( AuthResponse response ) {
+        Logger.d("onAuthSuccess");
+        mWebSocket.joinTable(TEST_TABLE_ID);
+        noOfPlayers = 1;
+
+    }
+
+    @Override
+    public void onJoinedTable(JoinTableResponse response) {
+        Logger.d("onJoinedTable "+response.tableId);
+        mWebSocket.broadCastJoined(response.tableId);
+    }
+
+    @Override
+    public void onPlayerJoined(PlayerJoinedResponse response) {
+        Logger.d("onPlayerJoined "+response.playerName);
+        if (viewModel.me.isDealer && noOfPlayers < 4) {
+            //Dealer sends the player position while creating the table first time
+            Logger.d("Filling up the table"); 
+        }
+    }
+
+    @Override
+    public void onFailure(WebSocketConnection.Reason failureReason, Throwable throwable) {
+
     }
 }
