@@ -184,6 +184,8 @@ public class ThuruppuKalli {
 
     public void updateUIAfterSecondSet() {
         showCards(4, 8);
+        ui.drawCards.setVisibility(View.GONE);
+        ui.shuffleDrawOptions.setVisibility(View.GONE);
     }
 
     private void showCards(int from, int to) {
