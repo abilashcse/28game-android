@@ -6,6 +6,9 @@ import com.agames.thuruppugulan.ui.main.game.props.Card;
 import com.agames.thuruppugulan.ui.main.game.props.Deck;
 import com.orhanobut.logger.Logger;
 
+import java.util.Collection;
+import java.util.Collections;
+
 public class TableFragmentViewModel extends ViewModel {
     public Player[] players = new Player[4];
     public String tableID;
@@ -25,6 +28,7 @@ public class TableFragmentViewModel extends ViewModel {
                 Player player = players[nextPosition];
                 player.cardsInHand.addAll(deck.getFourCardOnTop());
                 StringBuilder cardStr = new StringBuilder();
+                Collections.sort(player.cardsInHand);
                 for (Card card: player.cardsInHand) {
                     cardStr.append(card.getCardDetails()).append(", ");
                 }
