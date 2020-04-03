@@ -41,7 +41,7 @@ public class MainActivity extends BaseActivity {
             player.isDealer = true;
         } else {
             player.user = new GameUser();
-            int x = new Random().nextInt()%100;
+            int x = new Random().nextInt(99);
             player.user.setUserName("Player "+x);
         }
         if (!(getCurrentFragment() instanceof TableFragment)) {

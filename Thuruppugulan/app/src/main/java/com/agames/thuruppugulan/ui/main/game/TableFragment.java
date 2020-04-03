@@ -15,6 +15,7 @@ import com.agames.thuruppugulan.databinding.TableFragmentBinding;
 import com.agames.thuruppugulan.model.GameUser;
 import com.agames.thuruppugulan.ui.main.GameState;
 import com.agames.thuruppugulan.webrequest.WebSocketConnection;
+import com.fevziomurtekin.customprogress.Type;
 import com.orhanobut.logger.Logger;
 
 import agency.tango.android.avatarview.IImageLoader;
@@ -69,6 +70,9 @@ public class TableFragment extends BaseFragment implements View.OnClickListener,
         if (game == null) {
             game = new ThuruppuKalli(binding, me.playerPosition, mViewModel, this);
         }
+        binding.loadingLayout.setVisibility(View.VISIBLE);
+        binding.progress.settype(Type.CUBE);
+        binding.progress.show();
         if (createTable) {
             mViewModel.createTable = true;
             game.createTable();
@@ -112,7 +116,10 @@ public class TableFragment extends BaseFragment implements View.OnClickListener,
             mViewModel.players[3].playerPosition = 1;
             //Hard coding end
         } else {
-
+            binding.loadingLayout.setVisibility(View.GONE);
+            if (me.isDealer) {
+                binding.shuffleDrawOptions.setVisibility(View.VISIBLE);
+            }
         }
 
     }
