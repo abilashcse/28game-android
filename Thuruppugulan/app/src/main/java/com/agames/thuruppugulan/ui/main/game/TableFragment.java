@@ -84,6 +84,7 @@ public class TableFragment extends BaseFragment implements View.OnClickListener,
                 game.shuffleDeck();
                 break;
             case R.id.draw_cards:
+                binding.shuffleButton.setVisibility(View.GONE);
                 game.drawCards();
                 break;
 

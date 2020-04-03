@@ -1,7 +1,7 @@
 package com.agames.thuruppugulan.ui.main.game.props;
 
 
-public class Card implements  Comparable{
+public class Card implements Comparable<Card>{
 
     private int value;
     public final int slNo;
@@ -172,7 +172,12 @@ public class Card implements  Comparable{
     }
 
     @Override
-    public int compareTo(Object o) {
+    public int compareTo(Card card) {
+        if (card.suit == this.suit)  {
+            return card.rank.compareTo(this.rank);
+        } else {
+            
+        }
         return 0;
     }
 }
