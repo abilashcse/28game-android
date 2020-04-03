@@ -73,6 +73,14 @@ public class ThuruppuKalli {
                 ui.table.player3Card,
                 ui.table.player4Card
         };
+        for (CardView cardView: userCardViews) {
+            cardView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    
+                }
+            });
+        }
         clearViews();
     }
 
