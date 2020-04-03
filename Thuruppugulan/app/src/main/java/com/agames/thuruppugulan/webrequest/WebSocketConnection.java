@@ -5,12 +5,15 @@ import com.agames.thuruppugulan.webrequest.model.request.Authenticate;
 import com.agames.thuruppugulan.webrequest.model.BaseWebModel;
 import com.agames.thuruppugulan.webrequest.model.request.BroadcastJoined;
 import com.agames.thuruppugulan.webrequest.model.request.JoinTable;
+import com.agames.thuruppugulan.webrequest.model.request.PlayerDetails;
 import com.agames.thuruppugulan.webrequest.model.response.AuthResponse;
 import com.agames.thuruppugulan.webrequest.model.response.JoinTableResponse;
+import com.agames.thuruppugulan.webrequest.model.response.PlayerDetailsResponse;
 import com.agames.thuruppugulan.webrequest.model.response.PlayerJoinedResponse;
 import com.google.gson.Gson;
 import com.orhanobut.logger.Logger;
 
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
@@ -38,6 +41,7 @@ public class WebSocketConnection extends WebSocketListener {
         void onAuthSuccess(AuthResponse response );
         void onJoinedTable(JoinTableResponse response);
         void onPlayerJoined(PlayerJoinedResponse response);
+        void onPlayerDetailsReceived(PlayerDetailsResponse response);
         void onFailure(Reason failureReason, Throwable throwable);
     }
 
@@ -79,7 +83,9 @@ public class WebSocketConnection extends WebSocketListener {
     @Override
     public void onMessage(WebSocket webSocket, String text) {
         Logger.d("RECV->"+text);
-        processMessage(text);
+        if (text!=null) {
+            processMessage(text);
+        }
     }
 
     @Override
@@ -100,7 +106,8 @@ public class WebSocketConnection extends WebSocketListener {
     @Override
     public void onFailure(WebSocket webSocket, Throwable t, @Nullable Response response) {
         super.onFailure(webSocket, t, response);
-        Logger.e("Error in websocket creation..."+response+""+t);
+        Logger.e("Error in websocket creation..."+response);
+        t.printStackTrace();
         if (mListener != null) {
             mListener.onFailure(Reason.AUTH_FAIL, t);
         }
@@ -122,6 +129,7 @@ public class WebSocketConnection extends WebSocketListener {
 
     private void processMessage(String text) {
         Gson gson = new Gson();
+        Logger.d("processMessage");
         if (text.contains("auth")) {
             AuthResponse response = gson.fromJson(text, AuthResponse.class);
             mListener.onAuthSuccess(response);
@@ -129,9 +137,12 @@ public class WebSocketConnection extends WebSocketListener {
             JoinTableResponse response = gson.fromJson(text, JoinTableResponse.class);
             response.tableId = hubName;
             mListener.onJoinedTable(response);
-        } else if (text.contains("\"msg\":\"joined\"")){
+        } else if (text.contains("joined")){
             PlayerJoinedResponse response = gson.fromJson(text, PlayerJoinedResponse.class);
             mListener.onPlayerJoined(response);
+        } else if(text.contains("player_details")) {
+            PlayerDetailsResponse response = gson.fromJson(text, PlayerDetailsResponse.class);
+            mListener.onPlayerDetailsReceived(response);
         }
     }
 
@@ -157,9 +168,19 @@ public class WebSocketConnection extends WebSocketListener {
         sendMessage(broadcast);
     }
 
+    public void broadCastPlayerDetails(Player[] players) {
+        Logger.d("broadCastPlayerDetails");
+        PlayerDetails playerDetails = new PlayerDetails();
+        playerDetails.tableID = this.hubName;
+        playerDetails.players = players;
+        sendMessage(playerDetails);
+    }
+
     private void sendMessage(BaseWebModel auth) {
         if(webSocket!=null) {
-            webSocket.send(auth.toGSON());
+            String message = auth.toGSON();
+            Logger.json(message);
+            webSocket.send(message);
         }
     }
 

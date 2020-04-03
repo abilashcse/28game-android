@@ -2,23 +2,18 @@ package com.agames.thuruppugulan.ui.main.game;
 
 
 import android.annotation.SuppressLint;
-import android.content.res.Resources;
-import android.util.Log;
-import android.util.TypedValue;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import androidx.cardview.widget.CardView;
 
-import com.agames.thuruppugulan.R;
 import com.agames.thuruppugulan.databinding.TableFragmentBinding;
+import com.agames.thuruppugulan.model.GameUser;
 import com.agames.thuruppugulan.ui.main.GameState;
 import com.agames.thuruppugulan.ui.main.utils.ViewUtils;
 import com.agames.thuruppugulan.webrequest.WebSocketConnection;
 import com.agames.thuruppugulan.webrequest.model.response.AuthResponse;
 import com.agames.thuruppugulan.webrequest.model.response.JoinTableResponse;
+import com.agames.thuruppugulan.webrequest.model.response.PlayerDetailsResponse;
 import com.agames.thuruppugulan.webrequest.model.response.PlayerJoinedResponse;
 import com.orhanobut.logger.Logger;
 
@@ -42,6 +37,7 @@ public class ThuruppuKalli implements WebSocketConnection.OnWebSocketListener {
     public GameState state;
     private static final String STAGE_WS_INSTANCE = "00001023";
     private static final String TEST_TABLE_ID = "6542";
+    public static boolean NO_SOCKET;
     private WebSocketConnection mWebSocket;
 
     private int noOfPlayers;
@@ -157,12 +153,14 @@ public class ThuruppuKalli implements WebSocketConnection.OnWebSocketListener {
      * After table is created share the table id to friends and wait till they join.
      */
     public void createTable() {
-        if (viewModel.players[myPosition].isDealer) {
+        if (viewModel.me.isDealer) {
             state = GameState.CREATING_TABLE;
             viewModel.tableID = TEST_TABLE_ID;
             mWebSocket.connect(STAGE_WS_INSTANCE);
             state = GameState.WAITING_FOR_FRIENDS;
-            //mGameListener.onCreatedTable(TEST_TABLE_ID);
+            if (NO_SOCKET) {
+                mGameListener.onCreatedTable(TEST_TABLE_ID);
+            }
 
         }
     }
@@ -175,7 +173,7 @@ public class ThuruppuKalli implements WebSocketConnection.OnWebSocketListener {
      * SEND:{"toH":"<TableID>","msg":"joined"}
      */
     public void joinTable() {
-        if (!viewModel.players[myPosition].isDealer) {
+        if (!viewModel.me.isDealer) {
             mWebSocket.connect(STAGE_WS_INSTANCE);
             state = GameState.WAITING_FOR_FRIENDS;
         }
@@ -236,6 +234,10 @@ public class ThuruppuKalli implements WebSocketConnection.OnWebSocketListener {
         Logger.d("onAuthSuccess");
         mWebSocket.joinTable(TEST_TABLE_ID);
         noOfPlayers = 1;
+        if (viewModel.me.isDealer) {
+            //player[0] is always the person who created the table.
+            viewModel.players[0] = viewModel.me;
+        }
 
     }
 
@@ -248,10 +250,29 @@ public class ThuruppuKalli implements WebSocketConnection.OnWebSocketListener {
     @Override
     public void onPlayerJoined(PlayerJoinedResponse response) {
         Logger.d("onPlayerJoined "+response.playerName);
-        if (viewModel.me.isDealer && noOfPlayers < 4) {
+        if (viewModel.me != null && viewModel.me.isDealer && noOfPlayers < 4) {
             //Dealer sends the player position while creating the table first time
-            Logger.d("Filling up the table"); 
+            Logger.d("Filling up the table noOfPlayers = "+noOfPlayers);
+            GameUser user = new GameUser();
+            user.setUserName(response.playerName);
+            if (viewModel.players[noOfPlayers] == null) {
+                viewModel.players[noOfPlayers] = new Player();
+            }
+            viewModel.players[noOfPlayers].user = user;
+            viewModel.players[noOfPlayers].playerPosition = noOfPlayers;
+            mWebSocket.broadCastPlayerDetails(viewModel.players);
+            noOfPlayers++;
         }
+        if (noOfPlayers == 4) {
+            Logger.d("Table filled");
+            mGameListener.onCreatedTable(TEST_TABLE_ID);
+        }
+    }
+
+    @Override
+    public void onPlayerDetailsReceived(PlayerDetailsResponse response) {
+        Logger.d("onPlayerDetailsReceived "+response.players);
+        viewModel.players = response.players;
     }
 
     @Override

@@ -66,11 +66,11 @@ public class TableFragment extends BaseFragment implements View.OnClickListener,
         super.onActivityCreated(savedInstanceState);
         mViewModel = new ViewModelProvider(this).get(TableFragmentViewModel.class);
         mViewModel.me = me;
-        mViewModel.createTable = true;
         if (game == null) {
             game = new ThuruppuKalli(binding, me.playerPosition, mViewModel, this);
         }
         if (createTable) {
+            mViewModel.createTable = true;
             game.createTable();
         } else {
             game.joinTable();
@@ -95,21 +95,25 @@ public class TableFragment extends BaseFragment implements View.OnClickListener,
     @Override
     public void onCreatedTable(String tableId) {
         Logger.d("onCreatedTable "+tableId);
-        //Hard coding started
-        game.state = GameState.FRIENDS_JOINED;
-        mViewModel.players[1] = new Player();
-        mViewModel.players[1].user = new GameUser();
-        mViewModel.players[1].user.setUserName("Player 2");
-        mViewModel.players[1].playerPosition = 1;
-        mViewModel.players[2] = new Player();
-        mViewModel.players[2].user = new GameUser();
-        mViewModel.players[2].user.setUserName("Player 3");
-        mViewModel.players[2].playerPosition = 1;
-        mViewModel.players[3] = new Player();
-        mViewModel.players[3].user = new GameUser();
-        mViewModel.players[3].user.setUserName("Player 4");
-        mViewModel.players[3].playerPosition = 1;
-        //Hard coding end
+        if (ThuruppuKalli.NO_SOCKET) {
+            //Hard coding started
+            game.state = GameState.FRIENDS_JOINED;
+            mViewModel.players[1] = new Player();
+            mViewModel.players[1].user = new GameUser();
+            mViewModel.players[1].user.setUserName("Player 2");
+            mViewModel.players[1].playerPosition = 1;
+            mViewModel.players[2] = new Player();
+            mViewModel.players[2].user = new GameUser();
+            mViewModel.players[2].user.setUserName("Player 3");
+            mViewModel.players[2].playerPosition = 1;
+            mViewModel.players[3] = new Player();
+            mViewModel.players[3].user = new GameUser();
+            mViewModel.players[3].user.setUserName("Player 4");
+            mViewModel.players[3].playerPosition = 1;
+            //Hard coding end
+        } else {
+
+        }
 
     }
 
