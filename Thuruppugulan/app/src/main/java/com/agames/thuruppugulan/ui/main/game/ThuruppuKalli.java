@@ -219,12 +219,17 @@ public class ThuruppuKalli implements WebSocketConnection.OnWebSocketListener {
     }
 
     private void showCards(int from, int to) {
+        Player player = viewModel.players[viewModel.getMyPosition()];
+        if (player == null) {
+            Logger.e("Player is null");
+            return;
+        }
+        if (player.cardsInHand.isEmpty()) {
+            Logger.e("Cards are empty");
+            ViewUtils.showToast(uiActivity, "Error: Cards are empty");
+        }
         for (int i = from; i < to; i++) {
-            Player player = viewModel.me;
-            if (player == null) {
-                Logger.e("Player is null");
-                return;
-            }
+
             String cardIconStr = player.cardsInHand.get(i).getCardIcon();
             int resID = ui.getRoot().getResources().getIdentifier(cardIconStr,
                     "drawable", ui.getRoot().getContext().getPackageName());
@@ -294,8 +299,7 @@ public class ThuruppuKalli implements WebSocketConnection.OnWebSocketListener {
         viewModel.players = response.players;
         if (!viewModel.me.isDealer) {
             if (viewModel.players.length == 4) {
-                Logger.d("Table filled");
-                viewModel.findMyPlayerObject();
+                Logger.d("Table filled -- my position is "+viewModel.getMyPosition());
                 mGameListener.onJoinedTable(TEST_TABLE_ID);
             }
         }

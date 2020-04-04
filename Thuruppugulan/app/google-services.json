@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "125731529592",
+    "firebase_url": "https://thuruppukalli.firebaseio.com",
+    "project_id": "thuruppukalli",
+    "storage_bucket": "thuruppukalli.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:125731529592:android:ae40e6790c4aab6b189e8d",
+        "android_client_info": {
+          "package_name": "com.agames.thuruppugulan.debug"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "125731529592-2a092el0palu7vkd62812uk3nsrre2v2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDtAzP3Cod-LCeD1d0H3O1m8vCd4Bxmlis"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "125731529592-2a092el0palu7vkd62812uk3nsrre2v2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
