@@ -31,6 +31,8 @@ public class ThuruppuKalli implements WebSocketConnection.OnWebSocketListener {
         void onCreatedTable(String tableId);
 
         void onJoinedTable(String tableId);
+
+        void onGameCreationFailure(Throwable throwable);
     }
 
     private OnGameListener mGameListener;
@@ -263,8 +265,9 @@ public class ThuruppuKalli implements WebSocketConnection.OnWebSocketListener {
             mWebSocket.broadCastPlayerDetails(viewModel.players);
             noOfPlayers++;
         }
-        if (noOfPlayers == 4) {
+        if (noOfPlayers == 4 && viewModel.me.isDealer) {
             Logger.d("Table filled");
+            mWebSocket.broadCastAllPlayerJoined(viewModel.players);
             mGameListener.onCreatedTable(TEST_TABLE_ID);
         }
     }
@@ -276,7 +279,21 @@ public class ThuruppuKalli implements WebSocketConnection.OnWebSocketListener {
     }
 
     @Override
-    public void onFailure(WebSocketConnection.Reason failureReason, Throwable throwable) {
+    public void onAllPlayersJoined(PlayerDetailsResponse response) {
+        Logger.d("onAllPlayersJoined "+response.players);
+        viewModel.players = response.players;
+        if (!viewModel.me.isDealer) {
+            if (viewModel.players.length == 4) {
+                Logger.d("Table filled");
+                mGameListener.onJoinedTable(TEST_TABLE_ID);
+            }
+        }
+    }
 
+    @Override
+    public void onFailure(WebSocketConnection.Reason failureReason, Throwable throwable) {
+        Logger.e("onFailure");
+        throwable.printStackTrace();
+        mGameListener.onGameCreationFailure(throwable);
     }
 }

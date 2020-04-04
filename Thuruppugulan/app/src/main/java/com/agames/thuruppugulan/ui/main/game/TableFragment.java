@@ -14,9 +14,12 @@ import com.agames.thuruppugulan.base.BaseFragment;
 import com.agames.thuruppugulan.databinding.TableFragmentBinding;
 import com.agames.thuruppugulan.model.GameUser;
 import com.agames.thuruppugulan.ui.main.GameState;
+import com.agames.thuruppugulan.ui.main.utils.ViewUtils;
 import com.agames.thuruppugulan.webrequest.WebSocketConnection;
 import com.fevziomurtekin.customprogress.Type;
 import com.orhanobut.logger.Logger;
+
+import java.util.Objects;
 
 import agency.tango.android.avatarview.IImageLoader;
 import agency.tango.android.avatarview.loader.PicassoLoader;
@@ -99,9 +102,9 @@ public class TableFragment extends BaseFragment implements View.OnClickListener,
     @Override
     public void onCreatedTable(String tableId) {
         Logger.d("onCreatedTable "+tableId);
+        game.state = GameState.FRIENDS_JOINED;
         if (ThuruppuKalli.NO_SOCKET) {
             //Hard coding started
-            game.state = GameState.FRIENDS_JOINED;
             mViewModel.players[1] = new Player();
             mViewModel.players[1].user = new GameUser();
             mViewModel.players[1].user.setUserName("Player 2");
@@ -116,17 +119,44 @@ public class TableFragment extends BaseFragment implements View.OnClickListener,
             mViewModel.players[3].playerPosition = 1;
             //Hard coding end
         } else {
-            binding.loadingLayout.setVisibility(View.GONE);
-            if (me.isDealer) {
-                binding.shuffleDrawOptions.setVisibility(View.VISIBLE);
-            }
+            Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    binding.loadingLayout.setVisibility(View.GONE);
+                    if (me.isDealer) {
+                        binding.shuffleDrawOptions.setVisibility(View.VISIBLE);
+                    }
+                }
+            });
+
         }
 
     }
 
     @Override
     public void onJoinedTable(String tableId) {
-        Logger.d("onJoinedTable "+tableId);
+        Logger.d("onJoinedTable " + tableId);
+        Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                game.state = GameState.FRIENDS_JOINED;
+                binding.progress.setVisibility(View.GONE);
+                binding.loadingLayoutLoadingMessage.setText(String.format("Waiting for %sto Draw Cards",
+                        mViewModel.getDealerPlayer().user.getUserName()));
+            }
+        });
+    }
+
+    @Override
+    public void onGameCreationFailure(final Throwable throwable) {
+        Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                binding.loadingLayout.setVisibility(View.GONE);
+                ViewUtils.showToast(getContext(), "Error in Game creation");
+                throwable.printStackTrace();
+            }
+        });
     }
 
     @Override

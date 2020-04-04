@@ -42,6 +42,7 @@ public class WebSocketConnection extends WebSocketListener {
         void onJoinedTable(JoinTableResponse response);
         void onPlayerJoined(PlayerJoinedResponse response);
         void onPlayerDetailsReceived(PlayerDetailsResponse response);
+        void onAllPlayersJoined(PlayerDetailsResponse response);
         void onFailure(Reason failureReason, Throwable throwable);
     }
 
@@ -143,6 +144,9 @@ public class WebSocketConnection extends WebSocketListener {
         } else if(text.contains("player_details")) {
             PlayerDetailsResponse response = gson.fromJson(text, PlayerDetailsResponse.class);
             mListener.onPlayerDetailsReceived(response);
+        }else if(text.contains("all_players_connected")) {
+            PlayerDetailsResponse response = gson.fromJson(text, PlayerDetailsResponse.class);
+            mListener.onAllPlayersJoined(response);
         }
     }
 
@@ -171,6 +175,15 @@ public class WebSocketConnection extends WebSocketListener {
     public void broadCastPlayerDetails(Player[] players) {
         Logger.d("broadCastPlayerDetails");
         PlayerDetails playerDetails = new PlayerDetails();
+        playerDetails.tableID = this.hubName;
+        playerDetails.players = players;
+        sendMessage(playerDetails);
+    }
+
+    public void broadCastAllPlayerJoined(Player[] players) {
+        Logger.d("broadCastPlayerDetails");
+        PlayerDetails playerDetails = new PlayerDetails();
+        playerDetails.msg="all_players_connected";
         playerDetails.tableID = this.hubName;
         playerDetails.players = players;
         sendMessage(playerDetails);
