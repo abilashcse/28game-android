@@ -126,12 +126,6 @@ public class ThuruppuKalli implements WebSocketConnection.OnWebSocketListener {
             if (!isUserShufflingEventSend) {
                 isUserShufflingEventSend = true;
                 mWebSocket.sendShufflingEvent(viewModel.me);
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        isUserShufflingEventSend = false;
-                    }
-                },4000);
             }
         } else {
             ViewUtils.showToast(ui.getRoot().getContext(), "Only Dealer can shuffle cards");
@@ -324,6 +318,7 @@ public class ThuruppuKalli implements WebSocketConnection.OnWebSocketListener {
                 @Override
                 public void run() {
                     updateUIAfterFirstSet();
+                    ui.loadingLayout.setVisibility(View.GONE);
                 }
             });
         }
@@ -347,7 +342,7 @@ public class ThuruppuKalli implements WebSocketConnection.OnWebSocketListener {
         uiActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                ui.loadingLayoutLoadingMessage.setText(response.player.user.getUserName() + " is Shuffling Cards");
+                ui.loadingLayoutLoadingMessage.setText("\n"+response.player.user.getUserName() + " is Shuffling Cards...");
             }
         });
     }

@@ -21,6 +21,16 @@
         android:orientation="vertical"
         app:layout_constraintGuide_end="20dp" />
 
+    <TextView
+        android:id="@+id/my_info"
+        android:paddingTop="20dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/right_gutter"
+        app:layout_constraintStart_toStartOf="@+id/left_gutter"
+        tools:text="Player Name"
+        style="@style/size16"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
     <agency.tango.android.avatarview.views.AvatarView
         android:id="@+id/player3"
         android:layout_width="60dp"
@@ -147,6 +157,7 @@
                 style="@style/TableUserName"
                 android:gravity="center_horizontal"
                 android:layout_alignParentBottom="true"
+                android:animateLayoutChanges="true"
                 android:layout_width="140dp"
                 android:layout_height="wrap_content"/>
         </RelativeLayout>
@@ -162,6 +173,7 @@
             android:layout_margin="10dp"
             android:visibility="gone"
             tools:visibility="gone"
+            android:animateLayoutChanges="true"
             android:orientation="vertical">
             <com.dd.processbutton.iml.ActionProcessButton
                 android:id="@+id/shuffle_button"

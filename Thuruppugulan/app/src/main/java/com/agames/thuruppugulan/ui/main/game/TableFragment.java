@@ -68,6 +68,7 @@ public class TableFragment extends BaseFragment implements View.OnClickListener,
         if (game == null) {
             game = new ThuruppuKalli(getActivity(),binding, me.playerPosition, mViewModel, this);
         }
+        binding.myInfo.setText(me.user.getUserName());
         binding.loadingLayout.setVisibility(View.VISIBLE);
         binding.progress.settype(Type.CUBE);
         binding.progress.show();
@@ -85,6 +86,7 @@ public class TableFragment extends BaseFragment implements View.OnClickListener,
         switch (view.getId()) {
             case R.id.shuffle_button:
                 game.shuffleDeck();
+                binding.drawCards.setVisibility(View.VISIBLE);
                 break;
             case R.id.draw_cards:
                 binding.shuffleButton.setVisibility(View.GONE);
@@ -120,6 +122,7 @@ public class TableFragment extends BaseFragment implements View.OnClickListener,
                     binding.loadingLayout.setVisibility(View.GONE);
                     if (me.isDealer) {
                         binding.shuffleDrawOptions.setVisibility(View.VISIBLE);
+                        binding.drawCards.setVisibility(View.GONE);
                     }
                     loadPlayerDetails();
                 }
@@ -136,7 +139,6 @@ public class TableFragment extends BaseFragment implements View.OnClickListener,
             @Override
             public void run() {
                 game.state = GameState.FRIENDS_JOINED;
-                binding.progress.setVisibility(View.GONE);
                 binding.loadingLayoutLoadingMessage.setText(String.format("Waiting for %s to Draw Cards",
                         mViewModel.getDealerPlayer().user.getUserName()));
                 loadPlayerDetails();
@@ -172,12 +174,13 @@ public class TableFragment extends BaseFragment implements View.OnClickListener,
         AvatarView[] userView = {binding.player1, binding.player4, binding.player3, binding.player2};
         TextView[] userName = {binding.player1Name, binding.player4Name, binding.player3Name, binding.player2Name};
         int position = mViewModel.getMyPosition();
+        binding.myInfo.setText(mViewModel.players[position].user.getUserName());
         for (int i=0; i<4; i++) {
             String playerName = mViewModel.players[position].user.getUserName();
-            imageLoader.loadImage(userView[position],DEFAULT_PROFILE_PIC, playerName);
-            userName[position].setText(playerName);
+            imageLoader.loadImage(userView[i],DEFAULT_PROFILE_PIC, playerName);
+            userName[i].setText(playerName);
             if (position == 3){
-                position = 1;
+                position = 0;
             } else {
                 position++;
             }
