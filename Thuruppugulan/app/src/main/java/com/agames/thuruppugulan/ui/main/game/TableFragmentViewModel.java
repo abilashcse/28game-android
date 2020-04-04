@@ -56,4 +56,14 @@ public class TableFragmentViewModel extends ViewModel {
         }
         return null;
     }
+
+    public void findMyPlayerObject() {
+        for (int i = 0; i< 4; i++) {
+            if (players[i].user.getUserName().equals(me.user.getUserName())) {
+                this.me = players[i];
+                return;
+            }
+        }
+        Logger.e("Unable to findMyPlayerObject");
+    }
 }

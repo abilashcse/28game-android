@@ -43,6 +43,8 @@ public class WebSocketConnection extends WebSocketListener {
         void onPlayerJoined(PlayerJoinedResponse response);
         void onPlayerDetailsReceived(PlayerDetailsResponse response);
         void onAllPlayersJoined(PlayerDetailsResponse response);
+        void onFirstSetCardsReceived(PlayerDetailsResponse response);
+        void onSecondSetCardsReceived(PlayerDetailsResponse response);
         void onFailure(Reason failureReason, Throwable throwable);
     }
 
@@ -147,7 +149,14 @@ public class WebSocketConnection extends WebSocketListener {
         }else if(text.contains("all_players_connected")) {
             PlayerDetailsResponse response = gson.fromJson(text, PlayerDetailsResponse.class);
             mListener.onAllPlayersJoined(response);
+        }else if(text.contains("send_first_set_cards")) {
+            PlayerDetailsResponse response = gson.fromJson(text, PlayerDetailsResponse.class);
+            mListener.onFirstSetCardsReceived(response);
+        }else if(text.contains("send_second_set_cards")) {
+            PlayerDetailsResponse response = gson.fromJson(text, PlayerDetailsResponse.class);
+            mListener.onSecondSetCardsReceived(response);
         }
+
     }
 
 
@@ -181,13 +190,32 @@ public class WebSocketConnection extends WebSocketListener {
     }
 
     public void broadCastAllPlayerJoined(Player[] players) {
-        Logger.d("broadCastPlayerDetails");
+        Logger.d("broadCastAllPlayerJoined");
         PlayerDetails playerDetails = new PlayerDetails();
         playerDetails.msg="all_players_connected";
         playerDetails.tableID = this.hubName;
         playerDetails.players = players;
         sendMessage(playerDetails);
     }
+
+    public void sendFirstSetCards(Player[] players) {
+        Logger.d("sendCards");
+        PlayerDetails playerDetails = new PlayerDetails();
+        playerDetails.msg="send_first_set_cards";
+        playerDetails.tableID = this.hubName;
+        playerDetails.players = players;
+        sendMessage(playerDetails);
+    }
+
+    public void sendSecondSetCards(Player[] players) {
+        Logger.d("sendCards");
+        PlayerDetails playerDetails = new PlayerDetails();
+        playerDetails.msg="send_second_set_cards";
+        playerDetails.tableID = this.hubName;
+        playerDetails.players = players;
+        sendMessage(playerDetails);
+    }
+
 
     private void sendMessage(BaseWebModel auth) {
         if(webSocket!=null) {

@@ -2,6 +2,8 @@ package com.agames.thuruppugulan.ui.main.game;
 
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.os.Looper;
 import android.view.View;
 
 import androidx.cardview.widget.CardView;
@@ -24,6 +26,7 @@ public class ThuruppuKalli implements WebSocketConnection.OnWebSocketListener {
     private TableFragmentViewModel viewModel;
 
     private final TableFragmentBinding ui;
+    private final Activity uiActivity;
     private CardView[] userCardViews;
     private CardView[] tableCards;
 
@@ -52,7 +55,12 @@ public class ThuruppuKalli implements WebSocketConnection.OnWebSocketListener {
     public int myPosition;
 
 
-    public ThuruppuKalli(TableFragmentBinding ui, int myPosition, TableFragmentViewModel viewModel, OnGameListener listener) {
+    public ThuruppuKalli(Activity activity,
+                         TableFragmentBinding ui,
+                         int myPosition,
+                         TableFragmentViewModel viewModel,
+                         OnGameListener listener) {
+        this.uiActivity = activity;
         this.ui = ui;
         this.myPosition = myPosition;
         this.viewModel = viewModel;
@@ -130,8 +138,10 @@ public class ThuruppuKalli implements WebSocketConnection.OnWebSocketListener {
                 if (state == GameState.DRAWING_CARD_FIRST4) {
                     viewModel.drawSet();
                     updateUIAfterFirstSet();
+                    mWebSocket.sendFirstSetCards(viewModel.players);
                 } else if (state == GameState.DRAWING_CARD_LAST4) {
                     viewModel.drawSet();
+                    mWebSocket.sendSecondSetCards(viewModel.players);
                     updateUIAfterSecondSet();
                 }
             } else {
@@ -210,7 +220,7 @@ public class ThuruppuKalli implements WebSocketConnection.OnWebSocketListener {
 
     private void showCards(int from, int to) {
         for (int i = from; i < to; i++) {
-            Player player = viewModel.players[myPosition];
+            Player player = viewModel.me;
             if (player == null) {
                 Logger.e("Player is null");
                 return;
@@ -285,8 +295,35 @@ public class ThuruppuKalli implements WebSocketConnection.OnWebSocketListener {
         if (!viewModel.me.isDealer) {
             if (viewModel.players.length == 4) {
                 Logger.d("Table filled");
+                viewModel.findMyPlayerObject();
                 mGameListener.onJoinedTable(TEST_TABLE_ID);
             }
+        }
+    }
+
+    @Override
+    public void onFirstSetCardsReceived(PlayerDetailsResponse response) {
+        viewModel.players = response.players;
+        if (!viewModel.me.isDealer) {
+            uiActivity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    updateUIAfterFirstSet();
+                }
+            });
+        }
+    }
+
+    @Override
+    public void onSecondSetCardsReceived(PlayerDetailsResponse response) {
+        viewModel.players = response.players;
+        if (!viewModel.me.isDealer) {
+            uiActivity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    updateUIAfterSecondSet();
+                }
+            });
         }
     }
 

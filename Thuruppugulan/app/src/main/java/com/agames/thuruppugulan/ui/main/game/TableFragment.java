@@ -71,7 +71,7 @@ public class TableFragment extends BaseFragment implements View.OnClickListener,
         mViewModel = new ViewModelProvider(this).get(TableFragmentViewModel.class);
         mViewModel.me = me;
         if (game == null) {
-            game = new ThuruppuKalli(binding, me.playerPosition, mViewModel, this);
+            game = new ThuruppuKalli(getActivity(),binding, me.playerPosition, mViewModel, this);
         }
         binding.loadingLayout.setVisibility(View.VISIBLE);
         binding.progress.settype(Type.CUBE);
