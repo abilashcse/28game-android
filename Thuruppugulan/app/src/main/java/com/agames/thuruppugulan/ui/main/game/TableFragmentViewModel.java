@@ -14,6 +14,7 @@ public class TableFragmentViewModel extends ViewModel {
     public Deck deck = new Deck();
     public Card[] tableCards = new Card[4];
     public boolean createTable;
+    public Player me;
     public void shuffleDeck() {
         deck.shuffleDeck();
     }
@@ -54,5 +55,16 @@ public class TableFragmentViewModel extends ViewModel {
                 return players[i];
         }
         return null;
+    }
+
+    public int getMyPosition() {
+        for (int i = 0; i< 4; i++) {
+            if (players[i].user.getUserName().equals(me.user.getUserName())) {
+                this.me = players[i];
+                return i;
+            }
+        }
+        Logger.e("Unable to getMyPosition");
+        return -1;
     }
 }

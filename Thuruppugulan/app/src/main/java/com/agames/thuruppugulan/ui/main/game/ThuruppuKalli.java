@@ -2,28 +2,31 @@ package com.agames.thuruppugulan.ui.main.game;
 
 
 import android.annotation.SuppressLint;
-import android.content.res.Resources;
-import android.util.Log;
-import android.util.TypedValue;
+import android.app.Activity;
+import android.os.Looper;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import androidx.cardview.widget.CardView;
 
-import com.agames.thuruppugulan.R;
 import com.agames.thuruppugulan.databinding.TableFragmentBinding;
+import com.agames.thuruppugulan.model.GameUser;
 import com.agames.thuruppugulan.ui.main.GameState;
 import com.agames.thuruppugulan.ui.main.utils.ViewUtils;
+import com.agames.thuruppugulan.webrequest.WebSocketConnection;
+import com.agames.thuruppugulan.webrequest.model.response.AuthResponse;
+import com.agames.thuruppugulan.webrequest.model.response.JoinTableResponse;
+import com.agames.thuruppugulan.webrequest.model.response.PlayerDetailsResponse;
+import com.agames.thuruppugulan.webrequest.model.response.PlayerJoinedResponse;
 import com.orhanobut.logger.Logger;
 
 import java.util.Random;
 
-public class ThuruppuKalli {
+public class ThuruppuKalli implements WebSocketConnection.OnWebSocketListener {
+
     private TableFragmentViewModel viewModel;
 
     private final TableFragmentBinding ui;
+    private final Activity uiActivity;
     private CardView[] userCardViews;
     private CardView[] tableCards;
 
@@ -31,12 +34,18 @@ public class ThuruppuKalli {
         void onCreatedTable(String tableId);
 
         void onJoinedTable(String tableId);
+
+        void onGameCreationFailure(Throwable throwable);
     }
 
     private OnGameListener mGameListener;
     public GameState state;
+    private static final String STAGE_WS_INSTANCE = "00001023";
+    private static final String TEST_TABLE_ID = "6542";
+    public static boolean NO_SOCKET;
+    private WebSocketConnection mWebSocket;
 
-    private static String TEST_TABLE_ID = "6542";
+    private int noOfPlayers;
 
     // Position goes like
     // 1 - 2 - 3 - 4
@@ -46,13 +55,20 @@ public class ThuruppuKalli {
     public int myPosition;
 
 
-    public ThuruppuKalli(TableFragmentBinding ui, int myPosition, TableFragmentViewModel viewModel, OnGameListener listener) {
+    public ThuruppuKalli(Activity activity,
+                         TableFragmentBinding ui,
+                         int myPosition,
+                         TableFragmentViewModel viewModel,
+                         OnGameListener listener) {
+        this.uiActivity = activity;
         this.ui = ui;
         this.myPosition = myPosition;
         this.viewModel = viewModel;
         this.mGameListener = listener;
         initCardObjects(ui);
         state = GameState.INIT;
+        mWebSocket = WebSocketConnection.getInstance();
+        mWebSocket.setGameListener(this);
     }
 
     private void initCardObjects(com.agames.thuruppugulan.databinding.TableFragmentBinding ui) {
@@ -77,7 +93,7 @@ public class ThuruppuKalli {
             cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    
+
                 }
             });
         }
@@ -122,8 +138,10 @@ public class ThuruppuKalli {
                 if (state == GameState.DRAWING_CARD_FIRST4) {
                     viewModel.drawSet();
                     updateUIAfterFirstSet();
+                    mWebSocket.sendFirstSetCards(viewModel.players);
                 } else if (state == GameState.DRAWING_CARD_LAST4) {
                     viewModel.drawSet();
+                    mWebSocket.sendSecondSetCards(viewModel.players);
                     updateUIAfterSecondSet();
                 }
             } else {
@@ -147,11 +165,14 @@ public class ThuruppuKalli {
      * After table is created share the table id to friends and wait till they join.
      */
     public void createTable() {
-        if (viewModel.players[myPosition].isDealer) {
+        if (viewModel.me.isDealer) {
             state = GameState.CREATING_TABLE;
             viewModel.tableID = TEST_TABLE_ID;
+            mWebSocket.connect(STAGE_WS_INSTANCE);
             state = GameState.WAITING_FOR_FRIENDS;
-            mGameListener.onCreatedTable(TEST_TABLE_ID);
+            if (NO_SOCKET) {
+                mGameListener.onCreatedTable(TEST_TABLE_ID);
+            }
 
         }
     }
@@ -164,8 +185,9 @@ public class ThuruppuKalli {
      * SEND:{"toH":"<TableID>","msg":"joined"}
      */
     public void joinTable() {
-        if (!viewModel.players[myPosition].isDealer) {
-
+        if (!viewModel.me.isDealer) {
+            mWebSocket.connect(STAGE_WS_INSTANCE);
+            state = GameState.WAITING_FOR_FRIENDS;
         }
     }
 
@@ -197,12 +219,17 @@ public class ThuruppuKalli {
     }
 
     private void showCards(int from, int to) {
+        Player player = viewModel.players[viewModel.getMyPosition()];
+        if (player == null) {
+            Logger.e("Player is null");
+            return;
+        }
+        if (player.cardsInHand.isEmpty()) {
+            Logger.e("Cards are empty");
+            ViewUtils.showToast(uiActivity, "Error: Cards are empty");
+        }
         for (int i = from; i < to; i++) {
-            Player player = viewModel.players[myPosition];
-            if (player == null) {
-                Logger.e("Player is null");
-                return;
-            }
+
             String cardIconStr = player.cardsInHand.get(i).getCardIcon();
             int resID = ui.getRoot().getResources().getIdentifier(cardIconStr,
                     "drawable", ui.getRoot().getContext().getPackageName());
@@ -210,5 +237,104 @@ public class ThuruppuKalli {
             userCardViews[i].setVisibility(View.VISIBLE);
             userCardViews[i].setBackgroundResource(resID);
         }
+    }
+
+
+    @Override
+    public void onConnected() {
+        Logger.d("onConnected");
+        mWebSocket.auth(viewModel.me.user.getUserName());
+    }
+
+    @Override
+    public void onAuthSuccess( AuthResponse response ) {
+        Logger.d("onAuthSuccess");
+        mWebSocket.joinTable(TEST_TABLE_ID);
+        noOfPlayers = 1;
+        if (viewModel.me.isDealer) {
+            //player[0] is always the person who created the table.
+            viewModel.players[0] = viewModel.me;
+        }
+
+    }
+
+    @Override
+    public void onJoinedTable(JoinTableResponse response) {
+        Logger.d("onJoinedTable "+response.tableId);
+        mWebSocket.broadCastJoined(response.tableId);
+    }
+
+    @Override
+    public void onPlayerJoined(PlayerJoinedResponse response) {
+        Logger.d("onPlayerJoined "+response.playerName);
+        if (viewModel.me != null && viewModel.me.isDealer && noOfPlayers < 4) {
+            //Dealer sends the player position while creating the table first time
+            Logger.d("Filling up the table noOfPlayers = "+noOfPlayers);
+            GameUser user = new GameUser();
+            user.setUserName(response.playerName);
+            if (viewModel.players[noOfPlayers] == null) {
+                viewModel.players[noOfPlayers] = new Player();
+            }
+            viewModel.players[noOfPlayers].user = user;
+            viewModel.players[noOfPlayers].playerPosition = noOfPlayers;
+            mWebSocket.broadCastPlayerDetails(viewModel.players);
+            noOfPlayers++;
+        }
+        if (noOfPlayers == 4 && viewModel.me.isDealer) {
+            Logger.d("Table filled");
+            mWebSocket.broadCastAllPlayerJoined(viewModel.players);
+            mGameListener.onCreatedTable(TEST_TABLE_ID);
+        }
+    }
+
+    @Override
+    public void onPlayerDetailsReceived(PlayerDetailsResponse response) {
+        Logger.d("onPlayerDetailsReceived "+response.players);
+        viewModel.players = response.players;
+    }
+
+    @Override
+    public void onAllPlayersJoined(PlayerDetailsResponse response) {
+        Logger.d("onAllPlayersJoined "+response.players);
+        viewModel.players = response.players;
+        if (!viewModel.me.isDealer) {
+            if (viewModel.players.length == 4) {
+                Logger.d("Table filled -- my position is "+viewModel.getMyPosition());
+                mGameListener.onJoinedTable(TEST_TABLE_ID);
+            }
+        }
+    }
+
+    @Override
+    public void onFirstSetCardsReceived(PlayerDetailsResponse response) {
+        viewModel.players = response.players;
+        if (!viewModel.me.isDealer) {
+            uiActivity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    updateUIAfterFirstSet();
+                }
+            });
+        }
+    }
+
+    @Override
+    public void onSecondSetCardsReceived(PlayerDetailsResponse response) {
+        viewModel.players = response.players;
+        if (!viewModel.me.isDealer) {
+            uiActivity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    updateUIAfterSecondSet();
+                }
+            });
+        }
+    }
+
+    @Override
+    public void onFailure(WebSocketConnection.Reason failureReason, Throwable throwable) {
+        Logger.e("onFailure");
+        throwable.printStackTrace();
+        mGameListener.onGameCreationFailure(throwable);
     }
 }

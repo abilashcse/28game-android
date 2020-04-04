@@ -8,4 +8,5 @@
     <string name="player4">Player4</string>
     <string name="shuffle">Shuffle</string>
     <string name="draw_cards">Draw Cards</string>
+    <string name="waiting_for_friends">Waiting for friends...</string>
 </resources>

@@ -10,6 +10,8 @@ import com.agames.thuruppugulan.ui.main.game.TableFragment;
 import com.orhanobut.logger.AndroidLogAdapter;
 import com.orhanobut.logger.Logger;
 
+import java.util.Random;
+
 //http://achex.ca/dev/example_interactive.php
 //thuruppukali-stage@00001023
 // dnr2s35#13443%242nasfiyugkb
@@ -37,6 +39,10 @@ public class MainActivity extends BaseActivity {
             player.user.setUserName("Player 1");
             player.playerPosition = 0;
             player.isDealer = true;
+        } else {
+            player.user = new GameUser();
+            int x = new Random().nextInt(99);
+            player.user.setUserName("Player "+x);
         }
         if (!(getCurrentFragment() instanceof TableFragment)) {
             TableFragment newFragment = TableFragment.newInstance(player, createTable);

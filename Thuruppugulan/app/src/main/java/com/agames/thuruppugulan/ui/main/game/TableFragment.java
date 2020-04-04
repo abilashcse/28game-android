@@ -14,7 +14,12 @@ import com.agames.thuruppugulan.base.BaseFragment;
 import com.agames.thuruppugulan.databinding.TableFragmentBinding;
 import com.agames.thuruppugulan.model.GameUser;
 import com.agames.thuruppugulan.ui.main.GameState;
+import com.agames.thuruppugulan.ui.main.utils.ViewUtils;
+import com.agames.thuruppugulan.webrequest.WebSocketConnection;
+import com.fevziomurtekin.customprogress.Type;
 import com.orhanobut.logger.Logger;
+
+import java.util.Objects;
 
 import agency.tango.android.avatarview.IImageLoader;
 import agency.tango.android.avatarview.loader.PicassoLoader;
@@ -64,12 +69,15 @@ public class TableFragment extends BaseFragment implements View.OnClickListener,
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mViewModel = new ViewModelProvider(this).get(TableFragmentViewModel.class);
-        mViewModel.players[me.playerPosition] = me;
-        mViewModel.createTable = true;
+        mViewModel.me = me;
         if (game == null) {
-            game = new ThuruppuKalli(binding, me.playerPosition, mViewModel, this);
+            game = new ThuruppuKalli(getActivity(),binding, me.playerPosition, mViewModel, this);
         }
+        binding.loadingLayout.setVisibility(View.VISIBLE);
+        binding.progress.settype(Type.CUBE);
+        binding.progress.show();
         if (createTable) {
+            mViewModel.createTable = true;
             game.createTable();
         } else {
             game.joinTable();
@@ -94,26 +102,66 @@ public class TableFragment extends BaseFragment implements View.OnClickListener,
     @Override
     public void onCreatedTable(String tableId) {
         Logger.d("onCreatedTable "+tableId);
-        //Hard coding started
         game.state = GameState.FRIENDS_JOINED;
-        mViewModel.players[1] = new Player();
-        mViewModel.players[1].user = new GameUser();
-        mViewModel.players[1].user.setUserName("Player 2");
-        mViewModel.players[1].playerPosition = 1;
-        mViewModel.players[2] = new Player();
-        mViewModel.players[2].user = new GameUser();
-        mViewModel.players[2].user.setUserName("Player 3");
-        mViewModel.players[2].playerPosition = 1;
-        mViewModel.players[3] = new Player();
-        mViewModel.players[3].user = new GameUser();
-        mViewModel.players[3].user.setUserName("Player 4");
-        mViewModel.players[3].playerPosition = 1;
-        //Hard coding end
+        if (ThuruppuKalli.NO_SOCKET) {
+            //Hard coding started
+            mViewModel.players[1] = new Player();
+            mViewModel.players[1].user = new GameUser();
+            mViewModel.players[1].user.setUserName("Player 2");
+            mViewModel.players[1].playerPosition = 1;
+            mViewModel.players[2] = new Player();
+            mViewModel.players[2].user = new GameUser();
+            mViewModel.players[2].user.setUserName("Player 3");
+            mViewModel.players[2].playerPosition = 1;
+            mViewModel.players[3] = new Player();
+            mViewModel.players[3].user = new GameUser();
+            mViewModel.players[3].user.setUserName("Player 4");
+            mViewModel.players[3].playerPosition = 1;
+            //Hard coding end
+        } else {
+            Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    binding.loadingLayout.setVisibility(View.GONE);
+                    if (me.isDealer) {
+                        binding.shuffleDrawOptions.setVisibility(View.VISIBLE);
+                    }
+                }
+            });
+
+        }
 
     }
 
     @Override
     public void onJoinedTable(String tableId) {
-        Logger.d("onJoinedTable "+tableId);
+        Logger.d("onJoinedTable " + tableId);
+        Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                game.state = GameState.FRIENDS_JOINED;
+                binding.progress.setVisibility(View.GONE);
+                binding.loadingLayoutLoadingMessage.setText(String.format("Waiting for %sto Draw Cards",
+                        mViewModel.getDealerPlayer().user.getUserName()));
+            }
+        });
+    }
+
+    @Override
+    public void onGameCreationFailure(final Throwable throwable) {
+        Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                binding.loadingLayout.setVisibility(View.GONE);
+                ViewUtils.showToast(getContext(), "Error in Game creation");
+                throwable.printStackTrace();
+            }
+        });
+    }
+
+    @Override
+    public void onStop() {
+        WebSocketConnection.getInstance().close();
+        super.onStop();
     }
 }

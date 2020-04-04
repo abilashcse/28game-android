@@ -129,8 +129,31 @@
         app:layout_constraintEnd_toStartOf="@+id/player4"
         app:layout_constraintStart_toEndOf="@+id/player2"
         app:layout_constraintTop_toTopOf="parent"
-       >
-
+        android:orientation="horizontal">
+        <RelativeLayout
+            android:id="@+id/loading_layout"
+            xmlns:customprogress="http://schemas.android.com/apk/res-auto"
+            android:layout_width="140dp"
+            android:layout_height="140dp"
+            android:layout_margin="10dp"
+            android:visibility="visible"
+           >
+            <com.fevziomurtekin.customprogress.Dialog
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_alignParentStart="true"
+                android:id="@+id/progress"
+                customprogress:durationTime="50"
+                />
+            <TextView
+                android:id="@+id/loading_layout_loading_message"
+                android:text="@string/waiting_for_friends"
+                style="@style/TableUserName"
+                android:gravity="center_horizontal"
+                android:layout_alignParentBottom="true"
+                android:layout_width="140dp"
+                android:layout_height="wrap_content"/>
+        </RelativeLayout>
     <include
         android:id="@+id/table"
         android:visibility="gone"
@@ -141,6 +164,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
+            android:visibility="gone"
+            tools:visibility="gone"
             android:orientation="vertical">
             <com.dd.processbutton.iml.ActionProcessButton
                 android:id="@+id/shuffle_button"

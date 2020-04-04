@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'realm-android'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion 29
@@ -9,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId "com.agames.thuruppugulan"
-        minSdkVersion 19
+        minSdkVersion 21
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
@@ -21,6 +22,11 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            versionNameSuffix = '_release'
+        }
+        debug {
+            applicationIdSuffix = '.debug'
+            versionNameSuffix = '_debug'
         }
     }
     viewBinding {
@@ -42,12 +48,16 @@ dependencies {
     //if you want to use Picasso for loading images
     implementation 'agency.tango.android:avatar-view-picasso:0.0.2'
     //Firebase
+    implementation 'com.google.firebase:firebase-analytics:17.2.3'
     implementation 'com.google.firebase:firebase-storage:19.1.1'
     implementation 'com.google.firebase:firebase-auth:19.3.0'
 
     implementation 'com.github.dmytrodanylyk.android-process-button:library:1.0.0'
 
     implementation 'com.orhanobut:logger:2.2.0' //logging
+    implementation 'com.squareup.okhttp3:okhttp:3.12.0'
+    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'com.github.fevziomurtekin:custom-progress-dialog:0.1.0'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
@@ -58,4 +68,5 @@ dependencies {
 }
 repositories {
     mavenCentral()
+    maven { url 'https://jitpack.io' }
 }
