@@ -7,6 +7,7 @@ import com.agames.thuruppugulan.ui.main.game.props.Deck;
 import com.orhanobut.logger.Logger;
 
 import java.util.Collections;
+import java.util.Objects;
 
 public class TableFragmentViewModel extends ViewModel {
     public Player[] players = new Player[4];
@@ -59,8 +60,7 @@ public class TableFragmentViewModel extends ViewModel {
 
     public int getMyPosition() {
         for (int i = 0; i< 4; i++) {
-            if (players[i].user.getUserName().equals(me.user.getUserName())) {
-                this.me = players[i];
+            if (Objects.equals(players[i].user.getUserName(), me.user.getUserName())) {
                 return i;
             }
         }

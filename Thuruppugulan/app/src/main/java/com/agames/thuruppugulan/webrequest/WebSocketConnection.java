@@ -5,15 +5,16 @@ import com.agames.thuruppugulan.webrequest.model.request.Authenticate;
 import com.agames.thuruppugulan.webrequest.model.BaseWebModel;
 import com.agames.thuruppugulan.webrequest.model.request.BroadcastJoined;
 import com.agames.thuruppugulan.webrequest.model.request.JoinTable;
+import com.agames.thuruppugulan.webrequest.model.request.AllPlayersDetails;
 import com.agames.thuruppugulan.webrequest.model.request.PlayerDetails;
 import com.agames.thuruppugulan.webrequest.model.response.AuthResponse;
 import com.agames.thuruppugulan.webrequest.model.response.JoinTableResponse;
-import com.agames.thuruppugulan.webrequest.model.response.PlayerDetailsResponse;
+import com.agames.thuruppugulan.webrequest.model.response.AllPlayersDetailsResponse;
+import com.agames.thuruppugulan.webrequest.model.response.PlayerDetailResponse;
 import com.agames.thuruppugulan.webrequest.model.response.PlayerJoinedResponse;
 import com.google.gson.Gson;
 import com.orhanobut.logger.Logger;
 
-import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
@@ -41,10 +42,11 @@ public class WebSocketConnection extends WebSocketListener {
         void onAuthSuccess(AuthResponse response );
         void onJoinedTable(JoinTableResponse response);
         void onPlayerJoined(PlayerJoinedResponse response);
-        void onPlayerDetailsReceived(PlayerDetailsResponse response);
-        void onAllPlayersJoined(PlayerDetailsResponse response);
-        void onFirstSetCardsReceived(PlayerDetailsResponse response);
-        void onSecondSetCardsReceived(PlayerDetailsResponse response);
+        void onPlayerDetailsReceived(AllPlayersDetailsResponse response);
+        void onAllPlayersJoined(AllPlayersDetailsResponse response);
+        void onUserShufflingCards(PlayerDetailResponse response);
+        void onFirstSetCardsReceived(AllPlayersDetailsResponse response);
+        void onSecondSetCardsReceived(AllPlayersDetailsResponse response);
         void onFailure(Reason failureReason, Throwable throwable);
     }
 
@@ -144,17 +146,20 @@ public class WebSocketConnection extends WebSocketListener {
             PlayerJoinedResponse response = gson.fromJson(text, PlayerJoinedResponse.class);
             mListener.onPlayerJoined(response);
         } else if(text.contains("player_details")) {
-            PlayerDetailsResponse response = gson.fromJson(text, PlayerDetailsResponse.class);
+            AllPlayersDetailsResponse response = gson.fromJson(text, AllPlayersDetailsResponse.class);
             mListener.onPlayerDetailsReceived(response);
         }else if(text.contains("all_players_connected")) {
-            PlayerDetailsResponse response = gson.fromJson(text, PlayerDetailsResponse.class);
+            AllPlayersDetailsResponse response = gson.fromJson(text, AllPlayersDetailsResponse.class);
             mListener.onAllPlayersJoined(response);
         }else if(text.contains("send_first_set_cards")) {
-            PlayerDetailsResponse response = gson.fromJson(text, PlayerDetailsResponse.class);
+            AllPlayersDetailsResponse response = gson.fromJson(text, AllPlayersDetailsResponse.class);
             mListener.onFirstSetCardsReceived(response);
         }else if(text.contains("send_second_set_cards")) {
-            PlayerDetailsResponse response = gson.fromJson(text, PlayerDetailsResponse.class);
+            AllPlayersDetailsResponse response = gson.fromJson(text, AllPlayersDetailsResponse.class);
             mListener.onSecondSetCardsReceived(response);
+        }else if(text.contains("send_shuffling_event")) {
+            PlayerDetailResponse response = gson.fromJson(text, PlayerDetailResponse.class);
+            mListener.onUserShufflingCards(response);
         }
 
     }
@@ -183,36 +188,44 @@ public class WebSocketConnection extends WebSocketListener {
 
     public void broadCastPlayerDetails(Player[] players) {
         Logger.d("broadCastPlayerDetails");
-        PlayerDetails playerDetails = new PlayerDetails();
-        playerDetails.tableID = this.hubName;
-        playerDetails.players = players;
-        sendMessage(playerDetails);
+        AllPlayersDetails allPlayersDetails = new AllPlayersDetails();
+        allPlayersDetails.tableID = this.hubName;
+        allPlayersDetails.players = players;
+        sendMessage(allPlayersDetails);
     }
 
     public void broadCastAllPlayerJoined(Player[] players) {
         Logger.d("broadCastAllPlayerJoined");
-        PlayerDetails playerDetails = new PlayerDetails();
-        playerDetails.msg="all_players_connected";
-        playerDetails.tableID = this.hubName;
-        playerDetails.players = players;
-        sendMessage(playerDetails);
+        AllPlayersDetails allPlayersDetails = new AllPlayersDetails();
+        allPlayersDetails.msg="all_players_connected";
+        allPlayersDetails.tableID = this.hubName;
+        allPlayersDetails.players = players;
+        sendMessage(allPlayersDetails);
     }
 
     public void sendFirstSetCards(Player[] players) {
-        Logger.d("sendCards");
-        PlayerDetails playerDetails = new PlayerDetails();
-        playerDetails.msg="send_first_set_cards";
-        playerDetails.tableID = this.hubName;
-        playerDetails.players = players;
-        sendMessage(playerDetails);
+        Logger.d("sendFirstSetCards");
+        AllPlayersDetails allPlayersDetails = new AllPlayersDetails();
+        allPlayersDetails.msg="send_first_set_cards";
+        allPlayersDetails.tableID = this.hubName;
+        allPlayersDetails.players = players;
+        sendMessage(allPlayersDetails);
     }
 
     public void sendSecondSetCards(Player[] players) {
-        Logger.d("sendCards");
+        Logger.d("sendSecondSetCards");
+        AllPlayersDetails allPlayersDetails = new AllPlayersDetails();
+        allPlayersDetails.msg="send_second_set_cards";
+        allPlayersDetails.tableID = this.hubName;
+        allPlayersDetails.players = players;
+        sendMessage(allPlayersDetails);
+    }
+    public void sendShufflingEvent(Player me) {
+        Logger.d("sendSecondSetCards");
         PlayerDetails playerDetails = new PlayerDetails();
-        playerDetails.msg="send_second_set_cards";
+        playerDetails.msg="send_shuffling_event";
         playerDetails.tableID = this.hubName;
-        playerDetails.players = players;
+        playerDetails.player= me;
         sendMessage(playerDetails);
     }
 
