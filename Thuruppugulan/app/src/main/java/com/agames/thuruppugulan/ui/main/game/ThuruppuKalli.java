@@ -3,7 +3,7 @@ package com.agames.thuruppugulan.ui.main.game;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.os.Looper;
+import android.os.Handler;
 import android.view.View;
 
 import androidx.cardview.widget.CardView;
@@ -15,7 +15,8 @@ import com.agames.thuruppugulan.ui.main.utils.ViewUtils;
 import com.agames.thuruppugulan.webrequest.WebSocketConnection;
 import com.agames.thuruppugulan.webrequest.model.response.AuthResponse;
 import com.agames.thuruppugulan.webrequest.model.response.JoinTableResponse;
-import com.agames.thuruppugulan.webrequest.model.response.PlayerDetailsResponse;
+import com.agames.thuruppugulan.webrequest.model.response.AllPlayersDetailsResponse;
+import com.agames.thuruppugulan.webrequest.model.response.PlayerDetailResponse;
 import com.agames.thuruppugulan.webrequest.model.response.PlayerJoinedResponse;
 import com.orhanobut.logger.Logger;
 
@@ -54,6 +55,7 @@ public class ThuruppuKalli implements WebSocketConnection.OnWebSocketListener {
     // 4 - 1 - 2 - 3
     public int myPosition;
 
+    private boolean isUserShufflingEventSend;
 
     public ThuruppuKalli(Activity activity,
                          TableFragmentBinding ui,
@@ -121,6 +123,16 @@ public class ThuruppuKalli implements WebSocketConnection.OnWebSocketListener {
         }
         if (viewModel.players[myPosition].isDealer) {
             viewModel.shuffleDeck();
+            if (!isUserShufflingEventSend) {
+                isUserShufflingEventSend = true;
+                mWebSocket.sendShufflingEvent(viewModel.me);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        isUserShufflingEventSend = false;
+                    }
+                },4000);
+            }
         } else {
             ViewUtils.showToast(ui.getRoot().getContext(), "Only Dealer can shuffle cards");
         }
@@ -173,7 +185,6 @@ public class ThuruppuKalli implements WebSocketConnection.OnWebSocketListener {
             if (NO_SOCKET) {
                 mGameListener.onCreatedTable(TEST_TABLE_ID);
             }
-
         }
     }
 
@@ -288,13 +299,13 @@ public class ThuruppuKalli implements WebSocketConnection.OnWebSocketListener {
     }
 
     @Override
-    public void onPlayerDetailsReceived(PlayerDetailsResponse response) {
+    public void onPlayerDetailsReceived(AllPlayersDetailsResponse response) {
         Logger.d("onPlayerDetailsReceived "+response.players);
         viewModel.players = response.players;
     }
 
     @Override
-    public void onAllPlayersJoined(PlayerDetailsResponse response) {
+    public void onAllPlayersJoined(AllPlayersDetailsResponse response) {
         Logger.d("onAllPlayersJoined "+response.players);
         viewModel.players = response.players;
         if (!viewModel.me.isDealer) {
@@ -306,7 +317,7 @@ public class ThuruppuKalli implements WebSocketConnection.OnWebSocketListener {
     }
 
     @Override
-    public void onFirstSetCardsReceived(PlayerDetailsResponse response) {
+    public void onFirstSetCardsReceived(AllPlayersDetailsResponse response) {
         viewModel.players = response.players;
         if (!viewModel.me.isDealer) {
             uiActivity.runOnUiThread(new Runnable() {
@@ -319,7 +330,7 @@ public class ThuruppuKalli implements WebSocketConnection.OnWebSocketListener {
     }
 
     @Override
-    public void onSecondSetCardsReceived(PlayerDetailsResponse response) {
+    public void onSecondSetCardsReceived(AllPlayersDetailsResponse response) {
         viewModel.players = response.players;
         if (!viewModel.me.isDealer) {
             uiActivity.runOnUiThread(new Runnable() {
@@ -329,6 +340,16 @@ public class ThuruppuKalli implements WebSocketConnection.OnWebSocketListener {
                 }
             });
         }
+    }
+
+    @Override
+    public void onUserShufflingCards(final PlayerDetailResponse response) {
+        uiActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ui.loadingLayoutLoadingMessage.setText(response.player.user.getUserName() + " is Shuffling Cards");
+            }
+        });
     }
 
     @Override

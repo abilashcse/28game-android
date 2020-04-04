@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,6 +24,7 @@ import java.util.Objects;
 
 import agency.tango.android.avatarview.IImageLoader;
 import agency.tango.android.avatarview.loader.PicassoLoader;
+import agency.tango.android.avatarview.views.AvatarView;
 
 public class TableFragment extends BaseFragment implements View.OnClickListener, ThuruppuKalli.OnGameListener {
 
@@ -52,13 +54,6 @@ public class TableFragment extends BaseFragment implements View.OnClickListener,
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = TableFragmentBinding.inflate(getLayoutInflater());
         mRootView = binding.getRoot();
-
-        imageLoader = new PicassoLoader();
-
-        imageLoader.loadImage(binding.player1, DEFAULT_PROFILE_PIC, "1Player");
-        imageLoader.loadImage(binding.player2, DEFAULT_PROFILE_PIC, "2Player");
-        imageLoader.loadImage(binding.player3, DEFAULT_PROFILE_PIC, "3Player");
-        imageLoader.loadImage(binding.player4, DEFAULT_PROFILE_PIC, "4Player");
 
         binding.shuffleButton.setOnClickListener(this);
         binding.drawCards.setOnClickListener(this);
@@ -126,6 +121,7 @@ public class TableFragment extends BaseFragment implements View.OnClickListener,
                     if (me.isDealer) {
                         binding.shuffleDrawOptions.setVisibility(View.VISIBLE);
                     }
+                    loadPlayerDetails();
                 }
             });
 
@@ -141,8 +137,9 @@ public class TableFragment extends BaseFragment implements View.OnClickListener,
             public void run() {
                 game.state = GameState.FRIENDS_JOINED;
                 binding.progress.setVisibility(View.GONE);
-                binding.loadingLayoutLoadingMessage.setText(String.format("Waiting for %sto Draw Cards",
+                binding.loadingLayoutLoadingMessage.setText(String.format("Waiting for %s to Draw Cards",
                         mViewModel.getDealerPlayer().user.getUserName()));
+                loadPlayerDetails();
             }
         });
     }
@@ -163,5 +160,27 @@ public class TableFragment extends BaseFragment implements View.OnClickListener,
     public void onStop() {
         WebSocketConnection.getInstance().close();
         super.onStop();
+    }
+
+    // Position goes like
+    // 1 - 2 - 3 - 4
+    // 2 - 3 - 4 - 1
+    // 3 - 4 - 1 - 2
+    // 4 - 1 - 2 - 3
+    private void loadPlayerDetails() {
+        imageLoader = new PicassoLoader();
+        AvatarView[] userView = {binding.player1, binding.player4, binding.player3, binding.player2};
+        TextView[] userName = {binding.player1Name, binding.player4Name, binding.player3Name, binding.player2Name};
+        int position = mViewModel.getMyPosition();
+        for (int i=0; i<4; i++) {
+            String playerName = mViewModel.players[position].user.getUserName();
+            imageLoader.loadImage(userView[position],DEFAULT_PROFILE_PIC, playerName);
+            userName[position].setText(playerName);
+            if (position == 3){
+                position = 1;
+            } else {
+                position++;
+            }
+        }
     }
 }
