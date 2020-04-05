@@ -14,6 +14,7 @@ import com.agames.thuruppugulan.ui.main.GameState;
 import com.agames.thuruppugulan.ui.main.utils.ViewUtils;
 import com.agames.thuruppugulan.webrequest.WebSocketConnection;
 import com.agames.thuruppugulan.webrequest.model.response.AuthResponse;
+import com.agames.thuruppugulan.webrequest.model.response.BidSelectionResponse;
 import com.agames.thuruppugulan.webrequest.model.response.JoinTableResponse;
 import com.agames.thuruppugulan.webrequest.model.response.AllPlayersDetailsResponse;
 import com.agames.thuruppugulan.webrequest.model.response.PlayerDetailResponse;
@@ -33,9 +34,8 @@ public class ThuruppuKalli implements WebSocketConnection.OnWebSocketListener {
 
     public interface OnGameListener {
         void onCreatedTable(String tableId);
-
         void onJoinedTable(String tableId);
-
+        void selectBid(Player player, boolean canPass);
         void onGameCreationFailure(Throwable throwable);
     }
 
@@ -145,6 +145,8 @@ public class ThuruppuKalli implements WebSocketConnection.OnWebSocketListener {
                     viewModel.drawSet();
                     updateUIAfterFirstSet();
                     mWebSocket.sendFirstSetCards(viewModel.players);
+                    state = GameState.BID_SELECTION;
+                    sendBid(false);
                 } else if (state == GameState.DRAWING_CARD_LAST4) {
                     viewModel.drawSet();
                     mWebSocket.sendSecondSetCards(viewModel.players);
@@ -157,6 +159,20 @@ public class ThuruppuKalli implements WebSocketConnection.OnWebSocketListener {
             ViewUtils.showToast(ui.getRoot().getContext(), "Can't draw cards");
             return;
         }
+    }
+
+    private void sendBid(boolean canPass) {
+        int nextPosition = viewModel.getMyPosition();
+        if (!canPass) {
+            //First call
+            if (nextPosition == 3) {
+                nextPosition = 0;
+            } else {
+                nextPosition++;
+            }
+        } else {
+        }
+        mWebSocket.sendSelectBid(viewModel.players[nextPosition], canPass);
     }
 
     private void sortMyCards() {
@@ -312,6 +328,7 @@ public class ThuruppuKalli implements WebSocketConnection.OnWebSocketListener {
 
     @Override
     public void onFirstSetCardsReceived(AllPlayersDetailsResponse response) {
+        state = GameState.BID_SELECTION;
         viewModel.players = response.players;
         if (!viewModel.me.isDealer) {
             uiActivity.runOnUiThread(new Runnable() {
@@ -343,6 +360,16 @@ public class ThuruppuKalli implements WebSocketConnection.OnWebSocketListener {
             @Override
             public void run() {
                 ui.loadingLayoutLoadingMessage.setText("\n"+response.player.user.getUserName() + " is Shuffling Cards...");
+            }
+        });
+    }
+
+    @Override
+    public void onSelectBid(final BidSelectionResponse response) {
+        uiActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+               mGameListener.selectBid(response.player, response.canPass);
             }
         });
     }

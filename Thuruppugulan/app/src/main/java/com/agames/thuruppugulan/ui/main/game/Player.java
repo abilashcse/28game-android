@@ -14,6 +14,7 @@ public class Player {
     public int playerPosition;
     public ArrayList <Card> cardsInHand = new ArrayList<>();
     public ArrayList <Card> cardsWon = new ArrayList<>();
+    public int bidCalled;
     public boolean isTrump;
     public Card trumpCard;
     public int maxPoint;

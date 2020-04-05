@@ -19,6 +19,7 @@ public class ChooseBidDialog extends Dialog implements View.OnClickListener {
 
     private final Context ctx;
     private ChooseBidDialogBinding ui;
+
     public interface OnBidSelectionListener {
         void onBidSelected(int bid);
         void onThaniSelected();
@@ -26,6 +27,7 @@ public class ChooseBidDialog extends Dialog implements View.OnClickListener {
     }
 
     private OnBidSelectionListener mListener;
+    private boolean canPass;
 
     public ChooseBidDialog(Context ctx, OnBidSelectionListener listener) {
         super(ctx);
@@ -45,12 +47,16 @@ public class ChooseBidDialog extends Dialog implements View.OnClickListener {
 
     }
 
-    public void showBidDialog() {
+    public void showBidDialog(boolean canPass) {
         this.setCancelable(false);
+        this.canPass = canPass;
         this.show();
         Button[] bidButtons = {ui.bid14, ui.bid15, ui.bid16, ui.bid17, ui.bid18, ui.bid19, ui.bid20,
                 ui.bid21, ui.bid22, ui.bid23, ui.bid24, ui.bid25, ui.bid26, ui.bid27, ui.bid28,
                 ui.thani, ui.pass};
+        if (!canPass) {
+            ui.pass.setEnabled(false);
+        }
         for (int i=0; i< bidButtons.length; i++) {
             bidButtons[i].setOnClickListener(this);
         }
@@ -65,9 +71,11 @@ public class ChooseBidDialog extends Dialog implements View.OnClickListener {
                 dismiss();
                 break;
             case R.id.pass:
-                ViewUtils.showToast(ctx,"You selected to Pass");
-                mListener.onPassed();
-                dismiss();
+                if (canPass) {
+                    ViewUtils.showToast(ctx, "You selected to Pass");
+                    mListener.onPassed();
+                    dismiss();
+                }
                 break;
             default:
                 int selectedNumber = Integer.parseInt(((TextView)view).getText().toString().trim());

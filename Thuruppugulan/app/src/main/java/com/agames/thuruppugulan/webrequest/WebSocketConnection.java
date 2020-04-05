@@ -8,6 +8,7 @@ import com.agames.thuruppugulan.webrequest.model.request.JoinTable;
 import com.agames.thuruppugulan.webrequest.model.request.AllPlayersDetails;
 import com.agames.thuruppugulan.webrequest.model.request.PlayerDetails;
 import com.agames.thuruppugulan.webrequest.model.response.AuthResponse;
+import com.agames.thuruppugulan.webrequest.model.response.BidSelectionResponse;
 import com.agames.thuruppugulan.webrequest.model.response.JoinTableResponse;
 import com.agames.thuruppugulan.webrequest.model.response.AllPlayersDetailsResponse;
 import com.agames.thuruppugulan.webrequest.model.response.PlayerDetailResponse;
@@ -46,6 +47,7 @@ public class WebSocketConnection extends WebSocketListener {
         void onAllPlayersJoined(AllPlayersDetailsResponse response);
         void onUserShufflingCards(PlayerDetailResponse response);
         void onFirstSetCardsReceived(AllPlayersDetailsResponse response);
+        void onSelectBid(BidSelectionResponse response);
         void onSecondSetCardsReceived(AllPlayersDetailsResponse response);
         void onFailure(Reason failureReason, Throwable throwable);
     }
@@ -160,6 +162,9 @@ public class WebSocketConnection extends WebSocketListener {
         }else if(text.contains("send_shuffling_event")) {
             PlayerDetailResponse response = gson.fromJson(text, PlayerDetailResponse.class);
             mListener.onUserShufflingCards(response);
+        }else if(text.contains("send_select_bid")) {
+            BidSelectionResponse response = gson.fromJson(text, BidSelectionResponse.class);
+            mListener.onSelectBid(response);
         }
 
     }
@@ -229,6 +234,14 @@ public class WebSocketConnection extends WebSocketListener {
         sendMessage(playerDetails);
     }
 
+    public void sendSelectBid(Player player, boolean canPass) {
+        Logger.d("sendSelectBid "+player + "canPass = "+canPass);
+        PlayerDetails playerDetails = new PlayerDetails();
+        playerDetails.msg="send_select_bid";
+        playerDetails.tableID = this.hubName;
+        playerDetails.player= player;
+        sendMessage(playerDetails);
+    }
 
     private void sendMessage(BaseWebModel auth) {
         if(webSocket!=null) {
