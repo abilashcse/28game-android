@@ -4,4 +4,7 @@
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
     <color name="text_white">#defefe</color>
+    <color name="bid_text_color">#838596</color>
+    <color name="bid_button_background_color">#AAD1DB</color>
+    <color name="bid_ui_bg_color">#90BFB6</color>
 </resources>
