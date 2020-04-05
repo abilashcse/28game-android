@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.agames.thuruppugulan.MainActivity;
 import com.agames.thuruppugulan.R;
 import com.agames.thuruppugulan.base.BaseFragment;
+import com.agames.thuruppugulan.ui.main.game.popup.ChooseBidDialog;
 
 
 public class MainFragment extends BaseFragment implements View.OnClickListener {

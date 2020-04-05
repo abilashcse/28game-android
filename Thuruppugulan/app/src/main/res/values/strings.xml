@@ -9,4 +9,23 @@
     <string name="shuffle">Shuffle</string>
     <string name="draw_cards">Draw Cards</string>
     <string name="waiting_for_friends">Waiting for friends...</string>
+    <string name="_14">14</string>
+    <string name="_15">15</string>
+    <string name="_16">16</string>
+    <string name="_17">17</string>
+    <string name="_18">18</string>
+    <string name="_19">19</string>
+    <string name="_20">20</string>
+    <string name="_21">21</string>
+    <string name="_22">22</string>
+    <string name="_23">23</string>
+    <string name="_24">24</string>
+    <string name="_25">25</string>
+    <string name="_26">26</string>
+    <string name="_27">27</string>
+    <string name="_28">28</string>
+    <string name="thani">Thani</string>
+    <string name="pass">Pass</string>
+    <string name="select_your_bid">SELECT YOUR BID</string>
+    <string name="confirm">Confirm</string>
 </resources>
