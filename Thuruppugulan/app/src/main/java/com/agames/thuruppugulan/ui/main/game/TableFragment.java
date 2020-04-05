@@ -15,6 +15,7 @@ import com.agames.thuruppugulan.base.BaseFragment;
 import com.agames.thuruppugulan.databinding.TableFragmentBinding;
 import com.agames.thuruppugulan.model.GameUser;
 import com.agames.thuruppugulan.ui.main.GameState;
+import com.agames.thuruppugulan.ui.main.game.popup.ChooseBidDialog;
 import com.agames.thuruppugulan.ui.main.utils.ViewUtils;
 import com.agames.thuruppugulan.webrequest.WebSocketConnection;
 import com.fevziomurtekin.customprogress.Type;
@@ -147,6 +148,29 @@ public class TableFragment extends BaseFragment implements View.OnClickListener,
     }
 
     @Override
+    public void selectBid(Player player, boolean canPass) {
+        if(Objects.equals(me.user.getUserName(), player.user.getUserName())) {
+            ChooseBidDialog dialog = new ChooseBidDialog(getContext(), new ChooseBidDialog.OnBidSelectionListener() {
+                @Override
+                public void onBidSelected(int bid) {
+                    mViewModel.players[mViewModel.getMyPosition()].maxPoint = bid;
+                }
+
+                @Override
+                public void onThaniSelected() {
+
+                }
+
+                @Override
+                public void onPassed() {
+
+                }
+            });
+            dialog.showBidDialog(canPass);
+        }
+    }
+
+    @Override
     public void onGameCreationFailure(final Throwable throwable) {
         Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
             @Override
@@ -185,5 +209,7 @@ public class TableFragment extends BaseFragment implements View.OnClickListener,
                 position++;
             }
         }
+        binding.dealerName.setText(String.format("Dealer is %s", mViewModel.getDealerPlayer().user.getUserName()));
+
     }
 }
