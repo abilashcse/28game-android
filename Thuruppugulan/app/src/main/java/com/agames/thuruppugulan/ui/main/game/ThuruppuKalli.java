@@ -3,7 +3,6 @@ package com.agames.thuruppugulan.ui.main.game;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.os.Handler;
 import android.view.View;
 
 import androidx.cardview.widget.CardView;
@@ -36,6 +35,7 @@ public class ThuruppuKalli implements WebSocketConnection.OnWebSocketListener {
         void onCreatedTable(String tableId);
         void onJoinedTable(String tableId);
         void selectBid(Player player, boolean canPass);
+        void chooseTrump(Player player);
         void onGameCreationFailure(Throwable throwable);
     }
 
@@ -145,7 +145,7 @@ public class ThuruppuKalli implements WebSocketConnection.OnWebSocketListener {
                     viewModel.drawSet();
                     updateUIAfterFirstSet();
                     mWebSocket.sendFirstSetCards(viewModel.players);
-                    state = GameState.BID_SELECTION;
+                    state = GameState.FIRST_BID_SELECTION;
                     sendBid(false);
                 } else if (state == GameState.DRAWING_CARD_LAST4) {
                     viewModel.drawSet();
@@ -164,17 +164,70 @@ public class ThuruppuKalli implements WebSocketConnection.OnWebSocketListener {
     private void sendBid(boolean canPass) {
         int nextPosition = viewModel.getMyPosition();
         if (!canPass) {
-            //First call
-            if (nextPosition == 3) {
-                nextPosition = 0;
-            } else {
-                nextPosition++;
-            }
+            nextPosition = getNextBidPosition(nextPosition);
         } else {
         }
-        mWebSocket.sendSelectBid(viewModel.players[nextPosition], canPass);
+        mWebSocket.sendSelectBid(viewModel.players, nextPosition, canPass);
     }
 
+    private int getNextBidPosition(int nextPosition) {
+        //First call
+        if (nextPosition == 3) {
+            nextPosition = 0;
+        } else {
+            nextPosition++;
+        }
+        return nextPosition;
+    }
+
+
+    public void nextBid(boolean passed) {
+        int myPosition = viewModel.getMyPosition();
+        int nextPosition = -1;
+        if (passed) {
+            if (myPosition == 0) {
+                nextPosition = 2;
+            } else if (myPosition == 1) {
+                nextPosition = 3;
+            }else if (myPosition == 2) {
+                nextPosition = 0;
+            }else if (myPosition == 3) {
+                nextPosition = 1;
+            }
+        } else {
+            nextPosition = getNextBidPosition(myPosition);
+        }
+        if (!viewModel.players[nextPosition].bidCalled) {
+            mWebSocket.sendSelectBid(viewModel.players, nextPosition,true);
+        } else {
+           // mWebSocket.first
+            if (state == GameState.FIRST_BID_SELECTION) {
+                //All players called.... find the player who called the max point , select trump
+                Player maxBidPlayer = getMaxBidPlayer();
+                state = GameState.DRAWING_CARD_FIRST4;
+                if(maxBidPlayer.user.getUserName().equals(viewModel.me.user.getUserName())) {
+                    mGameListener.chooseTrump(maxBidPlayer);
+                } else {
+
+                }
+                mWebSocket.sendChooseTrump(maxBidPlayer);
+            }
+
+        }
+
+    }
+    private Player getMaxBidPlayer() {
+        Player maxBidPlayer = viewModel.players[0];
+        int max = maxBidPlayer.pointCalled;
+        for (int i =1 ; i<4; i++) {
+            if (viewModel.players[i].pointCalled > max) {
+                maxBidPlayer = viewModel.players[i];
+                max = viewModel.players[i].pointCalled;
+            }
+        }
+
+        return maxBidPlayer;
+    }
     private void sortMyCards() {
 
     }
@@ -328,7 +381,7 @@ public class ThuruppuKalli implements WebSocketConnection.OnWebSocketListener {
 
     @Override
     public void onFirstSetCardsReceived(AllPlayersDetailsResponse response) {
-        state = GameState.BID_SELECTION;
+        state = GameState.FIRST_BID_SELECTION;
         viewModel.players = response.players;
         if (!viewModel.me.isDealer) {
             uiActivity.runOnUiThread(new Runnable() {
@@ -366,10 +419,27 @@ public class ThuruppuKalli implements WebSocketConnection.OnWebSocketListener {
 
     @Override
     public void onSelectBid(final BidSelectionResponse response) {
+        viewModel.players = response.players;
         uiActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-               mGameListener.selectBid(response.player, response.canPass);
+                if (viewModel.getMyPosition() == response.position) {
+                    mGameListener.selectBid(viewModel.players[viewModel.getMyPosition()], response.canPass);
+                }
+            }
+        });
+    }
+
+    @Override
+    public void onChooseTrump(final BidSelectionResponse response) {
+        viewModel.players = response.players;
+        uiActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (viewModel.getMyPosition() == response.position) {
+                    mGameListener.chooseTrump(response.players[viewModel.getMyPosition()]);
+                }
+
             }
         });
     }

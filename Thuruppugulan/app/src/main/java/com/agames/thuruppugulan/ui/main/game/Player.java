@@ -14,10 +14,10 @@ public class Player {
     public int playerPosition;
     public ArrayList <Card> cardsInHand = new ArrayList<>();
     public ArrayList <Card> cardsWon = new ArrayList<>();
-    public int bidCalled;
+    public boolean bidCalled;
     public boolean isTrump;
     public Card trumpCard;
-    public int maxPoint;
+    public int pointCalled;
     public int getPoints() {
         int pointsEarn = 0;
         for (Card card: cardsWon) {

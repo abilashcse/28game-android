@@ -153,21 +153,29 @@ public class TableFragment extends BaseFragment implements View.OnClickListener,
             ChooseBidDialog dialog = new ChooseBidDialog(getContext(), new ChooseBidDialog.OnBidSelectionListener() {
                 @Override
                 public void onBidSelected(int bid) {
-                    mViewModel.players[mViewModel.getMyPosition()].maxPoint = bid;
+                    mViewModel.players[mViewModel.getMyPosition()].pointCalled = bid;
+                    mViewModel.players[mViewModel.getMyPosition()].bidCalled = true;
+                    game.nextBid(false);
                 }
 
                 @Override
                 public void onThaniSelected() {
-
+                    mViewModel.players[mViewModel.getMyPosition()].bidCalled = true;
                 }
 
                 @Override
                 public void onPassed() {
-
+                    game.nextBid(true);
                 }
             });
             dialog.showBidDialog(canPass);
         }
+    }
+
+    @Override
+    public void chooseTrump(Player player) {
+       // mViewModel.getPlayerPosition(player);
+        ViewUtils.showToast(this.getContext(), " "+player.user.getUserName()+" has to choose the trump");
     }
 
     @Override

@@ -56,7 +56,10 @@ public class ChooseBidDialog extends Dialog implements View.OnClickListener {
                 ui.thani, ui.pass};
         if (!canPass) {
             ui.pass.setEnabled(false);
+        } else {
+            ui.pass.setEnabled(true);
         }
+        ui.thani.setEnabled(false);
         for (int i=0; i< bidButtons.length; i++) {
             bidButtons[i].setOnClickListener(this);
         }

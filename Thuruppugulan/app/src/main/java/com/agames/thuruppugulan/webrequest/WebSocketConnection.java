@@ -3,6 +3,7 @@ package com.agames.thuruppugulan.webrequest;
 import com.agames.thuruppugulan.ui.main.game.Player;
 import com.agames.thuruppugulan.webrequest.model.request.Authenticate;
 import com.agames.thuruppugulan.webrequest.model.BaseWebModel;
+import com.agames.thuruppugulan.webrequest.model.request.BidSelection;
 import com.agames.thuruppugulan.webrequest.model.request.BroadcastJoined;
 import com.agames.thuruppugulan.webrequest.model.request.JoinTable;
 import com.agames.thuruppugulan.webrequest.model.request.AllPlayersDetails;
@@ -48,6 +49,7 @@ public class WebSocketConnection extends WebSocketListener {
         void onUserShufflingCards(PlayerDetailResponse response);
         void onFirstSetCardsReceived(AllPlayersDetailsResponse response);
         void onSelectBid(BidSelectionResponse response);
+        void onChooseTrump(BidSelectionResponse response);
         void onSecondSetCardsReceived(AllPlayersDetailsResponse response);
         void onFailure(Reason failureReason, Throwable throwable);
     }
@@ -165,6 +167,9 @@ public class WebSocketConnection extends WebSocketListener {
         }else if(text.contains("send_select_bid")) {
             BidSelectionResponse response = gson.fromJson(text, BidSelectionResponse.class);
             mListener.onSelectBid(response);
+        }else if(text.contains("send_choose_trump")) {
+            BidSelectionResponse response = gson.fromJson(text, BidSelectionResponse.class);
+            mListener.onChooseTrump(response);
         }
 
     }
@@ -234,12 +239,22 @@ public class WebSocketConnection extends WebSocketListener {
         sendMessage(playerDetails);
     }
 
-    public void sendSelectBid(Player player, boolean canPass) {
+    public void sendSelectBid(Player player[], int nextPosition, boolean canPass) {
         Logger.d("sendSelectBid "+player + "canPass = "+canPass);
-        PlayerDetails playerDetails = new PlayerDetails();
+        BidSelection playerDetails = new BidSelection();
         playerDetails.msg="send_select_bid";
         playerDetails.tableID = this.hubName;
-        playerDetails.player= player;
+        playerDetails.players = player;
+        playerDetails.position = nextPosition;
+        sendMessage(playerDetails);
+    }
+
+    public void sendChooseTrump(Player maxBidPlayer) {
+        Logger.d("sendChooseTrump "+maxBidPlayer);
+        PlayerDetails playerDetails = new PlayerDetails();
+        playerDetails.msg="send_choose_trump";
+        playerDetails.tableID = this.hubName;
+        playerDetails.player= maxBidPlayer;
         sendMessage(playerDetails);
     }
 

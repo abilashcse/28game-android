@@ -67,4 +67,17 @@ public class TableFragmentViewModel extends ViewModel {
         Logger.e("Unable to getMyPosition");
         return -1;
     }
+
+    public void updateDetailsForPlayer(Player player) {
+      players[getPlayerPosition(player)] = player;
+    }
+
+    public int getPlayerPosition(Player player) {
+        for (int i = 0; i< 4; i++) {
+            if (Objects.equals(players[i].user.getUserName(), player.user.getUserName())) {
+                return i;
+            }
+        }
+        return -1;
+    }
 }
