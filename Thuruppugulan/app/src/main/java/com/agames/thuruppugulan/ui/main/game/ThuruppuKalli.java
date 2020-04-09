@@ -14,6 +14,7 @@ import com.agames.thuruppugulan.ui.main.utils.ViewUtils;
 import com.agames.thuruppugulan.webrequest.WebSocketConnection;
 import com.agames.thuruppugulan.webrequest.model.response.AuthResponse;
 import com.agames.thuruppugulan.webrequest.model.response.BidSelectionResponse;
+import com.agames.thuruppugulan.webrequest.model.response.ChooseTrumpResponse;
 import com.agames.thuruppugulan.webrequest.model.response.JoinTableResponse;
 import com.agames.thuruppugulan.webrequest.model.response.AllPlayersDetailsResponse;
 import com.agames.thuruppugulan.webrequest.model.response.PlayerDetailResponse;
@@ -167,7 +168,7 @@ public class ThuruppuKalli implements WebSocketConnection.OnWebSocketListener {
             nextPosition = getNextBidPosition(nextPosition);
         } else {
         }
-        mWebSocket.sendSelectBid(viewModel.players, nextPosition, canPass);
+        mWebSocket.sendSelectBid(viewModel.players, nextPosition, true);
     }
 
     private int getNextBidPosition(int nextPosition) {
@@ -184,7 +185,7 @@ public class ThuruppuKalli implements WebSocketConnection.OnWebSocketListener {
     public void nextBid(boolean passed) {
         int myPosition = viewModel.getMyPosition();
         int nextPosition = -1;
-        if (passed) {
+        if (false) {
             if (myPosition == 0) {
                 nextPosition = 2;
             } else if (myPosition == 1) {
@@ -204,13 +205,14 @@ public class ThuruppuKalli implements WebSocketConnection.OnWebSocketListener {
             if (state == GameState.FIRST_BID_SELECTION) {
                 //All players called.... find the player who called the max point , select trump
                 Player maxBidPlayer = getMaxBidPlayer();
+                Logger.d("MaxBidPlayer = "+maxBidPlayer);
                 state = GameState.DRAWING_CARD_FIRST4;
                 if(maxBidPlayer.user.getUserName().equals(viewModel.me.user.getUserName())) {
                     mGameListener.chooseTrump(maxBidPlayer);
                 } else {
 
                 }
-                mWebSocket.sendChooseTrump(maxBidPlayer);
+                mWebSocket.sendChooseTrump(maxBidPlayer,viewModel.players);
             }
 
         }
@@ -431,13 +433,18 @@ public class ThuruppuKalli implements WebSocketConnection.OnWebSocketListener {
     }
 
     @Override
-    public void onChooseTrump(final BidSelectionResponse response) {
+    public void onChooseTrump(final ChooseTrumpResponse response) {
         viewModel.players = response.players;
+        Logger.d("response.maxBidPlayer = "+response.maxBidPlayer);
+        final int maxBidPlayerPosition = viewModel.getPlayerPosition(response.maxBidPlayer);
+        Logger.d("my position = "+viewModel.getMyPosition());
         uiActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (viewModel.getMyPosition() == response.position) {
+                if (viewModel.getMyPosition() == maxBidPlayerPosition) {
                     mGameListener.chooseTrump(response.players[viewModel.getMyPosition()]);
+                } else {
+                    ViewUtils.showToast(ui.getRoot().getContext(), " "+response.maxBidPlayer.user.getUserName()+ " is choosing Trump");
                 }
 
             }

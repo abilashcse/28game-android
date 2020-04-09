@@ -5,11 +5,13 @@ import com.agames.thuruppugulan.webrequest.model.request.Authenticate;
 import com.agames.thuruppugulan.webrequest.model.BaseWebModel;
 import com.agames.thuruppugulan.webrequest.model.request.BidSelection;
 import com.agames.thuruppugulan.webrequest.model.request.BroadcastJoined;
+import com.agames.thuruppugulan.webrequest.model.request.ChooseTrump;
 import com.agames.thuruppugulan.webrequest.model.request.JoinTable;
 import com.agames.thuruppugulan.webrequest.model.request.AllPlayersDetails;
 import com.agames.thuruppugulan.webrequest.model.request.PlayerDetails;
 import com.agames.thuruppugulan.webrequest.model.response.AuthResponse;
 import com.agames.thuruppugulan.webrequest.model.response.BidSelectionResponse;
+import com.agames.thuruppugulan.webrequest.model.response.ChooseTrumpResponse;
 import com.agames.thuruppugulan.webrequest.model.response.JoinTableResponse;
 import com.agames.thuruppugulan.webrequest.model.response.AllPlayersDetailsResponse;
 import com.agames.thuruppugulan.webrequest.model.response.PlayerDetailResponse;
@@ -49,7 +51,7 @@ public class WebSocketConnection extends WebSocketListener {
         void onUserShufflingCards(PlayerDetailResponse response);
         void onFirstSetCardsReceived(AllPlayersDetailsResponse response);
         void onSelectBid(BidSelectionResponse response);
-        void onChooseTrump(BidSelectionResponse response);
+        void onChooseTrump(ChooseTrumpResponse response);
         void onSecondSetCardsReceived(AllPlayersDetailsResponse response);
         void onFailure(Reason failureReason, Throwable throwable);
     }
@@ -168,7 +170,7 @@ public class WebSocketConnection extends WebSocketListener {
             BidSelectionResponse response = gson.fromJson(text, BidSelectionResponse.class);
             mListener.onSelectBid(response);
         }else if(text.contains("send_choose_trump")) {
-            BidSelectionResponse response = gson.fromJson(text, BidSelectionResponse.class);
+            ChooseTrumpResponse response = gson.fromJson(text, ChooseTrumpResponse.class);
             mListener.onChooseTrump(response);
         }
 
@@ -239,29 +241,29 @@ public class WebSocketConnection extends WebSocketListener {
         sendMessage(playerDetails);
     }
 
-    public void sendSelectBid(Player player[], int nextPosition, boolean canPass) {
-        Logger.d("sendSelectBid "+player + "canPass = "+canPass);
+    public void sendSelectBid(Player players[], int nextPosition, boolean canPass) {
+        Logger.d("sendSelectBid "+players + "canPass = "+canPass);
         BidSelection playerDetails = new BidSelection();
         playerDetails.msg="send_select_bid";
         playerDetails.tableID = this.hubName;
-        playerDetails.players = player;
+        playerDetails.players = players;
         playerDetails.position = nextPosition;
         sendMessage(playerDetails);
     }
 
-    public void sendChooseTrump(Player maxBidPlayer) {
+    public void sendChooseTrump(Player maxBidPlayer, Player players[]) {
         Logger.d("sendChooseTrump "+maxBidPlayer);
-        PlayerDetails playerDetails = new PlayerDetails();
-        playerDetails.msg="send_choose_trump";
-        playerDetails.tableID = this.hubName;
-        playerDetails.player= maxBidPlayer;
-        sendMessage(playerDetails);
+        ChooseTrump playersDetails = new ChooseTrump();
+        playersDetails.msg="send_choose_trump";
+        playersDetails.tableID = this.hubName;
+        playersDetails.players = players;
+        playersDetails.maxBidPlayer = maxBidPlayer;
+        sendMessage(playersDetails);
     }
 
     private void sendMessage(BaseWebModel auth) {
         if(webSocket!=null) {
             String message = auth.toGSON();
-            Logger.json(message);
             webSocket.send(message);
         }
     }

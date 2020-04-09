@@ -161,11 +161,14 @@ public class TableFragment extends BaseFragment implements View.OnClickListener,
                 @Override
                 public void onThaniSelected() {
                     mViewModel.players[mViewModel.getMyPosition()].bidCalled = true;
+                    game.nextBid(false);
                 }
 
                 @Override
                 public void onPassed() {
-                    game.nextBid(true);
+                    mViewModel.players[mViewModel.getMyPosition()].bidCalled = false;
+                    mViewModel.players[mViewModel.getMyPosition()].pointCalled = 0;
+                    game.nextBid(false);
                 }
             });
             dialog.showBidDialog(canPass);
@@ -175,7 +178,7 @@ public class TableFragment extends BaseFragment implements View.OnClickListener,
     @Override
     public void chooseTrump(Player player) {
        // mViewModel.getPlayerPosition(player);
-        ViewUtils.showToast(this.getContext(), " "+player.user.getUserName()+" has to choose the trump");
+        ViewUtils.showToast(this.getContext(), "You have to choose the trump");
     }
 
     @Override
