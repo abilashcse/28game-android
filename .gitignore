@@ -20,6 +20,20 @@ out/
 # Gradle files
 .gradle/
 build/
+**/build/
+.kotlin/
+
+# Xcode / iOS
+iosApp/iosApp.xcodeproj/xcuserdata/
+iosApp/iosApp.xcodeproj/project.xcworkspace/xcuserdata/
+DerivedData/
+*.xcuserstate
+Pods/
+
+# Kotlin Multiplatform
+*.framework
+*.xcframework
+binaries/
 
 # Local configuration file (sdk path, etc)
 local.properties
