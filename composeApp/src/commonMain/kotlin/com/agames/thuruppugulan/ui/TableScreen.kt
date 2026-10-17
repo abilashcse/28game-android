@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width // used in MATCH_OVER action row
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -47,17 +47,25 @@ fun TableScreen(
     onShuffle: () -> Unit,
     onDeal: () -> Unit,
     onBid: (Int) -> Unit,
+    onThani: () -> Unit,
     onPass: () -> Unit,
     onChooseTrump: (Card) -> Unit,
+    onDouble: () -> Unit,
+    onRedouble: () -> Unit,
+    onSkipDoubling: () -> Unit,
     onPlay: (Card) -> Unit,
+    onExposeAndPlay: (Card) -> Unit,
     onNewRound: () -> Unit,
     onLeave: () -> Unit,
 ) {
-    var showBidSheet by remember(snapshot.phase, snapshot.bidToActSeat) {
+    var showBidSheet by remember(snapshot.phase, snapshot.bidToActSeat, isLocalTurn) {
         mutableStateOf(snapshot.phase == GamePhase.BIDDING && isLocalTurn)
     }
-    var selectingTrump by remember(snapshot.phase) {
+    var selectingTrump by remember(snapshot.phase, isLocalTurn) {
         mutableStateOf(snapshot.phase == GamePhase.CHOOSING_TRUMP && isLocalTurn)
+    }
+    var exposeMode by remember(snapshot.canExposeTrump, isLocalTurn) {
+        mutableStateOf(false)
     }
 
     Column(
@@ -80,51 +88,68 @@ fun TableScreen(
                 .padding(12.dp),
         ) {
             val seats = seatViews(snapshot)
-            seats["top"]?.let { SeatBadge(it, Modifier.align(Alignment.TopCenter)) }
-            seats["left"]?.let { SeatBadge(it, Modifier.align(Alignment.CenterStart)) }
-            seats["right"]?.let { SeatBadge(it, Modifier.align(Alignment.CenterEnd)) }
+            seats["top"]?.let { SeatBadge(it, snapshot, Modifier.align(Alignment.TopCenter)) }
+            seats["left"]?.let { SeatBadge(it, snapshot, Modifier.align(Alignment.CenterStart)) }
+            seats["right"]?.let { SeatBadge(it, snapshot, Modifier.align(Alignment.CenterEnd)) }
 
-            TrickArea(
-                snapshot = snapshot,
-                modifier = Modifier.align(Alignment.Center),
-            )
+            TrickArea(snapshot, Modifier.align(Alignment.Center))
 
             Text(
                 text = snapshot.statusMessage,
-                color = TableColors.cream.copy(alpha = 0.9f),
+                color = TableColors.cream.copy(alpha = 0.92f),
                 fontSize = 13.sp,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 4.dp),
+                    .padding(bottom = 4.dp, start = 8.dp, end = 8.dp),
             )
         }
 
         Spacer(modifier = Modifier.height(10.dp))
-        ActionRow(snapshot, onShuffle, onDeal, onNewRound)
+        ActionRow(
+            snapshot = snapshot,
+            isLocalTurn = isLocalTurn,
+            exposeMode = exposeMode,
+            onShuffle = onShuffle,
+            onDeal = onDeal,
+            onDouble = onDouble,
+            onRedouble = onRedouble,
+            onSkipDoubling = onSkipDoubling,
+            onToggleExpose = { exposeMode = !exposeMode },
+            onNewRound = onNewRound,
+        )
 
         val local = snapshot.players.getOrNull(snapshot.localSeat)
         if (local != null) {
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = if (selectingTrump) "Tap a card to set concealed trump" else local.displayName,
+                text = when {
+                    selectingTrump -> "Tap a card from your first four to set concealed trump"
+                    exposeMode -> "Tap a card to expose trump and play it"
+                    else -> "${local.displayName} · ${local.hand.size} cards · team ${local.team}"
+                },
                 color = TableColors.gold,
                 fontWeight = FontWeight.SemiBold,
+                fontSize = 13.sp,
             )
             Spacer(modifier = Modifier.height(6.dp))
             LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                items(local.hand, key = { it.details }) { card ->
+                items(local.hand, key = { "${it.suit}-${it.rank}" }) { card ->
                     val playable = card in legalPlays && isLocalTurn &&
                         snapshot.phase in listOf(GamePhase.FIRST_PHASE, GamePhase.SECOND_PHASE)
                     PlayingCard(
                         card = card,
-                        selected = selectingTrump,
-                        enabled = selectingTrump || playable,
+                        selected = selectingTrump || (exposeMode && playable),
+                        enabled = selectingTrump || playable || (exposeMode && isLocalTurn),
                         onClick = {
                             when {
                                 selectingTrump -> {
                                     onChooseTrump(card)
                                     selectingTrump = false
+                                }
+                                exposeMode && snapshot.canExposeTrump -> {
+                                    onExposeAndPlay(card)
+                                    exposeMode = false
                                 }
                                 playable -> onPlay(card)
                             }
@@ -141,6 +166,10 @@ fun TableScreen(
             canPass = snapshot.canPass,
             onBid = {
                 onBid(it)
+                showBidSheet = false
+            },
+            onThani = {
+                onThani()
                 showBidSheet = false
             },
             onPass = {
@@ -162,7 +191,12 @@ private fun TopBar(snapshot: GameSnapshot, onLeave: () -> Unit) {
         Column {
             Text("Thuruppugulan", color = TableColors.gold, fontWeight = FontWeight.Bold, fontSize = 20.sp)
             Text(
-                text = "Table ${snapshot.tableId ?: "—"} · ${snapshot.phase.name}",
+                text = buildString {
+                    append("4 players · ${snapshot.phase.name}")
+                    snapshot.tableId?.let { append(" · $it") }
+                    if (snapshot.thani) append(" · THANI")
+                    if (snapshot.doubled) append(" · x${snapshot.stakeMultiplier}")
+                },
                 color = TableColors.cream.copy(alpha = 0.7f),
                 fontSize = 12.sp,
             )
@@ -183,31 +217,51 @@ private fun ScoreRow(snapshot: GameSnapshot) {
             .padding(horizontal = 14.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        Text("Us (0/2): ${snapshot.teamScores[0] ?: 0}", color = TableColors.cream)
-        Text("Them (1/3): ${snapshot.teamScores[1] ?: 0}", color = TableColors.cream)
-        snapshot.trumpSuit?.let {
-            Text(
-                text = if (snapshot.trumpExposed) "Trump ${it.symbol}" else "Trump ?",
-                color = TableColors.gold,
-                fontWeight = FontWeight.SemiBold,
-            )
-        }
+        Text("Us ${chaka(snapshot.teamScores[0] ?: 0)}", color = TableColors.cream)
+        Text("Them ${chaka(snapshot.teamScores[1] ?: 0)}", color = TableColors.cream)
+        Text(
+            text = when {
+                snapshot.trumpExposed -> "Trump ${snapshot.trumpSuit?.symbol ?: "?"}"
+                snapshot.trumpSuit != null -> "Trump ?"
+                else -> "Tricks ${snapshot.tricksPlayed}/8"
+            },
+            color = TableColors.gold,
+            fontWeight = FontWeight.SemiBold,
+        )
     }
 }
 
+private fun chaka(score: Int): String = when {
+    score > 0 -> "●".repeat(score.coerceAtMost(6)) + " +$score"
+    score < 0 -> "○".repeat((-score).coerceAtMost(6)) + " $score"
+    else -> "—"
+}
+
 @Composable
-private fun SeatBadge(player: Player, modifier: Modifier = Modifier) {
+private fun SeatBadge(player: Player, snapshot: GameSnapshot, modifier: Modifier = Modifier) {
+    val isTurn = snapshot.turnSeat == player.seat ||
+        (snapshot.phase == GamePhase.BIDDING && snapshot.bidToActSeat == player.seat)
     Column(modifier = modifier.padding(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
         Box(
             modifier = Modifier
                 .clip(CircleShape)
-                .background(TableColors.gold.copy(alpha = 0.25f))
+                .background(
+                    if (isTurn) TableColors.gold.copy(alpha = 0.45f)
+                    else TableColors.gold.copy(alpha = 0.2f),
+                )
                 .padding(10.dp),
         ) {
             Text(player.displayName.take(1), color = TableColors.gold, fontWeight = FontWeight.Bold)
         }
         Text(player.displayName, color = TableColors.cream, fontSize = 12.sp)
-        Text("${player.hand.size} cards", color = TableColors.cream.copy(alpha = 0.6f), fontSize = 11.sp)
+        Text(
+            "${player.hand.size}c · ${player.pointsWon()}pts",
+            color = TableColors.cream.copy(alpha = 0.6f),
+            fontSize = 11.sp,
+        )
+        if (player.isDealer) {
+            Text("Dealer", color = TableColors.gold, fontSize = 10.sp)
+        }
     }
 }
 
@@ -215,10 +269,17 @@ private fun SeatBadge(player: Player, modifier: Modifier = Modifier) {
 private fun TrickArea(snapshot: GameSnapshot, modifier: Modifier = Modifier) {
     Row(modifier = modifier, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         if (snapshot.currentTrick.isEmpty()) {
-            Text("Trick pile", color = TableColors.cream.copy(alpha = 0.35f))
+            Text("Trick", color = TableColors.cream.copy(alpha = 0.35f))
         } else {
             snapshot.currentTrick.forEach { play ->
-                PlayingCard(card = play.card, width = 48.dp, height = 72.dp)
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    PlayingCard(card = play.card, width = 48.dp, height = 72.dp)
+                    Text(
+                        snapshot.players.getOrNull(play.seat)?.displayName?.take(3) ?: "?",
+                        color = TableColors.cream.copy(alpha = 0.7f),
+                        fontSize = 10.sp,
+                    )
+                }
             }
         }
     }
@@ -227,35 +288,84 @@ private fun TrickArea(snapshot: GameSnapshot, modifier: Modifier = Modifier) {
 @Composable
 private fun ActionRow(
     snapshot: GameSnapshot,
+    isLocalTurn: Boolean,
+    exposeMode: Boolean,
     onShuffle: () -> Unit,
     onDeal: () -> Unit,
+    onDouble: () -> Unit,
+    onRedouble: () -> Unit,
+    onSkipDoubling: () -> Unit,
+    onToggleExpose: () -> Unit,
     onNewRound: () -> Unit,
 ) {
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
         when (snapshot.phase) {
-            GamePhase.READY_TO_DEAL, GamePhase.ROUND_OVER -> {
-                if (snapshot.players.getOrNull(snapshot.localSeat)?.isDealer == true || snapshot.offlineMode) {
-                    Button(
-                        onClick = onShuffle,
-                        colors = ButtonDefaults.buttonColors(containerColor = TableColors.felt, contentColor = TableColors.cream),
-                    ) { Text("Shuffle") }
-                    Button(
-                        onClick = onDeal,
-                        colors = ButtonDefaults.buttonColors(containerColor = TableColors.gold, contentColor = TableColors.feltDeep),
-                    ) { Text("Deal") }
-                }
-                if (snapshot.phase == GamePhase.ROUND_OVER) {
-                    Button(onClick = onNewRound) { Text("Next round") }
+            GamePhase.READY_TO_DEAL, GamePhase.CANCELLED -> {
+                Button(
+                    onClick = onShuffle,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = TableColors.felt,
+                        contentColor = TableColors.cream,
+                    ),
+                ) { Text("Shuffle") }
+                Button(
+                    onClick = onDeal,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = TableColors.gold,
+                        contentColor = TableColors.feltDeep,
+                    ),
+                ) { Text("Deal 4") }
+                if (snapshot.phase == GamePhase.CANCELLED) {
+                    Text(snapshot.cancelReason ?: "Cancelled", color = TableColors.cream, fontSize = 12.sp)
                 }
             }
-            GamePhase.MATCH_OVER -> {
-                Text("Match over", color = TableColors.gold, fontWeight = FontWeight.Bold)
+            GamePhase.DOUBLING -> {
+                if (isLocalTurn && snapshot.canDouble) {
+                    Button(onClick = onDouble) { Text("Double") }
+                    Button(onClick = onSkipDoubling) { Text("No double") }
+                } else if (isLocalTurn && snapshot.canRedouble) {
+                    Button(onClick = onRedouble) { Text("Redouble") }
+                    Button(onClick = onSkipDoubling) { Text("Accept") }
+                } else {
+                    Text("Waiting on double…", color = TableColors.cream)
+                }
+            }
+            GamePhase.FIRST_PHASE -> {
+                if (snapshot.canExposeTrump && isLocalTurn) {
+                    Button(
+                        onClick = onToggleExpose,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (exposeMode) TableColors.gold else TableColors.felt,
+                            contentColor = if (exposeMode) TableColors.feltDeep else TableColors.cream,
+                        ),
+                    ) { Text(if (exposeMode) "Exposing…" else "Call Trump") }
+                }
+                Text("Phase 1 · trick ${snapshot.tricksPlayed + 1}", color = TableColors.cream)
+            }
+            GamePhase.SECOND_PHASE -> {
+                Text(
+                    "Phase 2 · Trump ${snapshot.trumpSuit?.symbol} · trick ${snapshot.tricksPlayed + 1}",
+                    color = TableColors.cream,
+                )
+            }
+            GamePhase.ROUND_OVER, GamePhase.MATCH_OVER -> {
+                snapshot.lastRound?.let { r ->
+                    Text(
+                        if (r.bidMade) "Made ${r.bid}" else "Down ${r.bid}",
+                        color = TableColors.gold,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
                 Spacer(modifier = Modifier.width(8.dp))
-                Button(onClick = onNewRound) { Text("Play again") }
+                Button(onClick = onNewRound) {
+                    Text(if (snapshot.phase == GamePhase.MATCH_OVER) "New match" else "Next round")
+                }
             }
-            GamePhase.BIDDING -> {
-                Text("Bidding…", color = TableColors.cream)
-            }
+            GamePhase.BIDDING -> Text("Auction…", color = TableColors.cream)
+            GamePhase.CHOOSING_TRUMP -> Text("Choosing trump…", color = TableColors.cream)
             else -> Unit
         }
     }
@@ -265,10 +375,5 @@ private fun seatViews(snapshot: GameSnapshot): Map<String, Player> {
     if (snapshot.players.size < 4) return emptyMap()
     val local = snapshot.localSeat
     fun at(offset: Int) = snapshot.players[(local + offset) % 4]
-    // Offline seats: 0 local bottom, 1 left, 2 top partner, 3 right — but deal order is CCW
-    return mapOf(
-        "top" to at(2),
-        "left" to at(1),
-        "right" to at(3),
-    )
+    return mapOf("top" to at(2), "left" to at(1), "right" to at(3))
 }

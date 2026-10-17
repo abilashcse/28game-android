@@ -27,6 +27,7 @@ fun BidSheet(
     options: List<Int>,
     canPass: Boolean,
     onBid: (Int) -> Unit,
+    onThani: () -> Unit,
     onPass: () -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -37,7 +38,7 @@ fun BidSheet(
         contentColor = TableColors.cream,
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
-            Text("Your bid", fontWeight = FontWeight.Bold)
+            Text("Your bid (min ${options.firstOrNull() ?: 14})", fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(12.dp))
             FlowRow(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -51,13 +52,14 @@ fun BidSheet(
                             containerColor = TableColors.gold,
                             contentColor = TableColors.feltDeep,
                         ),
-                    ) {
-                        Text("$bid")
-                    }
+                    ) { Text("$bid") }
                 }
             }
+            Spacer(modifier = Modifier.height(8.dp))
+            TextButton(onClick = onThani) {
+                Text("Thani (solo)", color = TableColors.gold)
+            }
             if (canPass) {
-                Spacer(modifier = Modifier.height(8.dp))
                 TextButton(onClick = onPass) {
                     Text("Pass", color = TableColors.cream)
                 }

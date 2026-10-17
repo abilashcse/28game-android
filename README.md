@@ -46,11 +46,13 @@ Kotlin Multiplatform + Compose Multiplatform port of **Thuruppugulan** (28 / Lel
 ./gradlew :shared:cleanAllTests :shared:allTests
 ```
 
-## Game rules (summary)
+## Game rules
 
-Four players in fixed partnerships. 32-card deck ranked **J-9-A-10-K-Q-8-7**. Points: J=3, 9=2, A=1, 10=1 (28 total). Auction for concealed trump; bidding side must make the bid in card points. Match ends at ±6 game points.
+Full implemented rules: see [`RULES.md`](RULES.md).
 
-See `legacy/android-java` README history and the in-repo analysis for full traditional variants.
+Four players in fixed partnerships (you + partner vs two opponents). 32-card deck ranked **J-9-A-10-K-Q-8-7**. Points: J=3, 9=2, A=1, 10=1 (28 total). Auction, concealed trump, expose, doubles, overtrump, cancel conditions, and chaka scoring to ±6 are all in the shared engine.
+
+Offline mode: **you + 3 bots** play a complete match.
 
 ## Package
 

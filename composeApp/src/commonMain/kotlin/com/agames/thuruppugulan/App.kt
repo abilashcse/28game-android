@@ -7,7 +7,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import com.agames.thuruppugulan.domain.GamePhase
 import com.agames.thuruppugulan.session.GameController
 import com.agames.thuruppugulan.ui.LobbyScreen
 import com.agames.thuruppugulan.ui.TableScreen
@@ -50,22 +49,20 @@ fun App() {
                 onShuffle = controller::shuffle,
                 onDeal = controller::deal,
                 onBid = controller::bid,
+                onThani = controller::thani,
                 onPass = controller::pass,
                 onChooseTrump = controller::chooseTrump,
+                onDouble = controller::doubleStake,
+                onRedouble = controller::redoubleStake,
+                onSkipDoubling = controller::skipDoubling,
                 onPlay = controller::play,
+                onExposeAndPlay = controller::exposeAndPlay,
                 onNewRound = controller::newRound,
                 onLeave = {
                     controller.dispose()
                     screen = AppScreen.Lobby
                 },
             )
-        }
-
-        // Keep bid sheet in sync when bots advance auction to local seat
-        if (screen == AppScreen.Table &&
-            snapshot.phase == GamePhase.WAITING_FOR_PLAYERS
-        ) {
-            // no-op placeholder for future online seat UI
         }
     }
 }

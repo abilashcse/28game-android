@@ -87,7 +87,7 @@ fun LobbyScreen(
                     contentColor = TableColors.feltDeep,
                 ),
             ) {
-                Text("Play offline (bots)", fontWeight = FontWeight.SemiBold)
+                Text("Play 4-player (you + 3 bots)", fontWeight = FontWeight.SemiBold)
             }
 
             Spacer(modifier = Modifier.height(12.dp))

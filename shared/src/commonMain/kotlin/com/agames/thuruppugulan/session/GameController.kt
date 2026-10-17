@@ -18,9 +18,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
-/**
- * UI-facing controller. Holds [GameSnapshot] state for Compose and optional online sync.
- */
+/** UI-facing façade over [ThuruppuGame] for a perfect 4-player table. */
 class GameController(
     private val game: ThuruppuGame = ThuruppuGame(),
     private val socket: GameSocket = GameSocket(),
@@ -47,9 +45,7 @@ class GameController(
                     ),
                 )
             }.onFailure { err ->
-                _state.update { snap ->
-                    snap.copy(statusMessage = "Online connect failed: ${err.message}. Use offline mode.")
-                }
+                _state.update { it.copy(statusMessage = "Online failed: ${err.message}. Use offline.") }
             }
         }
     }
@@ -59,30 +55,25 @@ class GameController(
         scope.launch {
             runCatching {
                 socket.connect(playerName, tableId)
-                socket.broadcast(
-                    HubBroadcast(tableId = tableId, msg = MessageType.JOINED),
-                )
+                socket.broadcast(HubBroadcast(tableId = tableId, msg = MessageType.JOINED))
             }.onFailure { err ->
-                _state.update { snap ->
-                    snap.copy(statusMessage = "Join failed: ${err.message}")
-                }
+                _state.update { it.copy(statusMessage = "Join failed: ${err.message}") }
             }
         }
     }
 
     fun shuffle() = publish(game.shuffle())
-
     fun deal() = publish(game.dealFirstFour())
-
     fun bid(amount: Int) = publish(game.placeBid(amount))
-
+    fun thani() = publish(game.declareThani())
     fun pass() = publish(game.passBid())
-
     fun chooseTrump(card: Card) = publish(game.chooseTrump(card))
-
+    fun doubleStake() = publish(game.declareDouble())
+    fun redoubleStake() = publish(game.declareRedouble())
+    fun skipDoubling() = publish(game.skipDoubling())
     fun play(card: Card) = publish(game.playCard(card))
-
     fun exposeAndPlay(card: Card) = publish(game.exposeTrumpAndPlay(card))
+    fun newRound() = publish(game.startNextRound())
 
     fun legalPlays(): List<Card> {
         val snap = _state.value
@@ -93,10 +84,20 @@ class GameController(
 
     fun isLocalTurn(): Boolean {
         val snap = _state.value
+        val local = snap.localSeat
         return when (snap.phase) {
-            GamePhase.BIDDING -> snap.bidToActSeat == snap.localSeat
-            GamePhase.CHOOSING_TRUMP -> snap.highestBidderSeat == snap.localSeat
-            GamePhase.FIRST_PHASE, GamePhase.SECOND_PHASE -> snap.turnSeat == snap.localSeat
+            GamePhase.BIDDING -> snap.bidToActSeat == local
+            GamePhase.CHOOSING_TRUMP -> snap.highestBidderSeat == local
+            GamePhase.DOUBLING -> {
+                val bidderTeam = (snap.highestBidderSeat ?: 0) % 2
+                val localTeam = local % 2
+                when {
+                    snap.canDouble && localTeam != bidderTeam -> true
+                    snap.canRedouble && localTeam == bidderTeam -> true
+                    else -> false
+                }
+            }
+            GamePhase.FIRST_PHASE, GamePhase.SECOND_PHASE -> snap.turnSeat == local
             else -> false
         }
     }
@@ -104,34 +105,6 @@ class GameController(
     fun bidOptions(): List<Int> {
         val min = (_state.value.currentBid + 1).coerceAtLeast(Rank.MIN_BID)
         return (min..Rank.MAX_BID).toList()
-    }
-
-    fun newRound() {
-        if (_state.value.phase == GamePhase.ROUND_OVER || _state.value.phase == GamePhase.MATCH_OVER) {
-            val players = _state.value.players.map {
-                it.copy(
-                    hand = emptyList(),
-                    wonCards = emptyList(),
-                    bid = null,
-                    isTrumpChooser = false,
-                )
-            }
-            val scores = _state.value.teamScores
-            val offline = _state.value.offlineMode
-            val tableId = _state.value.tableId
-            val localSeat = _state.value.localSeat
-            game.replacePlayers(players)
-            publish(
-                game.snapshot().copy(
-                    phase = GamePhase.READY_TO_DEAL,
-                    teamScores = scores,
-                    offlineMode = offline,
-                    tableId = tableId,
-                    localSeat = localSeat,
-                    statusMessage = "New round — shuffle & deal",
-                ),
-            )
-        }
     }
 
     fun dispose() {
